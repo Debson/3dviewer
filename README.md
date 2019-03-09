@@ -1,2 +1,2 @@
 # model_loader
-3D scene renderer and model loader in OpenGL
+3D scene renderer and model loader in Java using OpenGL
