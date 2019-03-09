@@ -61,6 +61,8 @@ public class Core
 
         glfwShowWindow(window);
 
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
        /* glfwSetCursorPosCallback(window, (window, posX, posY) ->
         {
             Input.CursorPosCallback(posX, posY);
@@ -80,7 +82,6 @@ public class Core
 
     public void RunGame(GameHandlerInterface gameHandler)
     {
-
         GL.createCapabilities();
 
         glClearColor(1.f, 0.6f, 0.f, 1.f);
@@ -88,8 +89,13 @@ public class Core
         DoubleBuffer mousePosX = BufferUtils.createDoubleBuffer(1);
         DoubleBuffer mousePosY = BufferUtils.createDoubleBuffer(1);
 
+        double currentTime = 0.0, prevTime = 0.0;
         while(!glfwWindowShouldClose(window))
         {
+            prevTime = currentTime;
+            currentTime = Time.GetTicks();
+            Time.deltaTime = currentTime - prevTime;
+
             gameHandler.OnNewFrame();
             Input.OnStartFrame();
 

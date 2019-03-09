@@ -14,11 +14,11 @@ public class Camera
             Right
         };
 
-        public Vector3f position;
-        public Vector3f front;
+        public Vector3f position = new Vector3f();
+        public Vector3f front = new Vector3f();
         public Vector3f up = new Vector3f();
         public Vector3f right = new Vector3f();
-        public Vector3f worldUp;
+        public Vector3f worldUp = new Vector3f();
 
         public float yaw;
         public float pitch;
@@ -71,6 +71,33 @@ public class Camera
         void processKeyboard(CameraMovement dir, float dT, float speed)
         {
             speed = SPEED;
+
+            float velocity = speed * dT;
+            Vector3f pos = new Vector3f();
+            switch(dir)
+            {
+                case Forward: {
+                    front.mul(velocity, pos);
+                    position.add(pos);
+                    break;
+                }
+                case Backward: {
+                    front.mul(velocity, pos);
+                    position.sub(pos);
+                    break;
+                }
+                case Left: {
+                    right.mul(velocity, pos);
+                    position.sub(pos);
+                    break;
+                }
+                case Right: {
+                    right.mul(velocity, pos);
+                    position.add(pos);
+                    break;
+                }
+            }
+
         }
 
         void processMouseMovement(float offsetX, float offsetY)
@@ -101,11 +128,12 @@ public class Camera
             Front.y = (float)Math.sin(Math.toRadians(pitch));
             Front.z = (float)(Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));
             Front.normalize(front);
-
-            // Bug hmm
-            /*front.cross(worldUp, right);
-            right.cross(front, up);*/
-            right.normalize();
-            up.normalize();
+            
+            Vector3f r = new Vector3f();
+            Vector3f u = new Vector3f();
+            front.cross(worldUp, r).normalize();
+            right = r;
+            right.cross(front, u).normalize();
+            up = u;
         }
 }

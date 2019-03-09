@@ -23,6 +23,7 @@ public class Scene implements GameHandlerInterface
     private int vao, vbo;
     private Matrix4f model;
     private double mouseX, mouseY, mousePrevX, mousePrevY;
+    private float cameraMoveSpeed = 15.f;
 
 
     @Override
@@ -76,13 +77,9 @@ public class Scene implements GameHandlerInterface
     @Override
     public void OnRealtimeUpdate()
     {
-        Vector2f relMousePos = Input.GetRelativeMousePos();
-        /*if(relMousePos.x != 0) System.out.println(relMousePos.x);
-        if(relMousePos.y != 0) System.out.println(relMousePos.y);*/
+        processCameraInput();
 
-        camera.processMouseMovement(relMousePos.x, relMousePos.y);
-
-        if(Input.IsKeyPressed(Input.Keycode.E))
+        if(Input.IsKeyPressed(Keycode.E))
             System.out.println("EEEEEE");
 
     }
@@ -105,6 +102,24 @@ public class Scene implements GameHandlerInterface
         shader.setMat4("projection", camera.getProjectionMatrix());
         shader.setMat4("view", camera.getViewMatrix());
         shader.setMat4("model", model);
+    }
+
+    private void processCameraInput()
+    {
+        Vector2f relMousePos = Input.GetRelativeMousePos();
+        /*if(relMousePos.x != 0) System.out.println(relMousePos.x);
+        if(relMousePos.y != 0) System.out.println(relMousePos.y);*/
+
+        camera.processMouseMovement(relMousePos.x, relMousePos.y);
+
+        if(Input.IsKeyDown(Keycode.W))
+            camera.processKeyboard(Camera.CameraMovement.Forward, (float)Time.deltaTime, cameraMoveSpeed);
+        if(Input.IsKeyDown(Keycode.S))
+            camera.processKeyboard(Camera.CameraMovement.Backward, (float)Time.deltaTime, cameraMoveSpeed);
+        if(Input.IsKeyDown(Keycode.A))
+            camera.processKeyboard(Camera.CameraMovement.Left, (float)Time.deltaTime, cameraMoveSpeed);
+        if(Input.IsKeyDown(Keycode.D))
+            camera.processKeyboard(Camera.CameraMovement.Right, (float)Time.deltaTime, cameraMoveSpeed);
     }
 
     public static void main(String[] args)
