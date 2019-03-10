@@ -23,7 +23,7 @@ public class Scene implements GameHandlerInterface
     private int vao, vbo;
     private Matrix4f model;
     private double mouseX, mouseY, mousePrevX, mousePrevY;
-    private float cameraMoveSpeed = 15.f;
+    private float cameraMoveSpeed = 10.f;
 
 
     @Override
@@ -112,14 +112,19 @@ public class Scene implements GameHandlerInterface
 
         camera.processMouseMovement(relMousePos.x, relMousePos.y);
 
+        float speed = cameraMoveSpeed;
+
+        if(Input.IsKeyDown(Keycode.LShift))
+            speed *= 3.f;
+
         if(Input.IsKeyDown(Keycode.W))
-            camera.processKeyboard(Camera.CameraMovement.Forward, (float)Time.deltaTime, cameraMoveSpeed);
+            camera.processKeyboard(Camera.CameraMovement.Forward, (float)Time.deltaTime, speed);
         if(Input.IsKeyDown(Keycode.S))
-            camera.processKeyboard(Camera.CameraMovement.Backward, (float)Time.deltaTime, cameraMoveSpeed);
+            camera.processKeyboard(Camera.CameraMovement.Backward, (float)Time.deltaTime, speed);
         if(Input.IsKeyDown(Keycode.A))
-            camera.processKeyboard(Camera.CameraMovement.Left, (float)Time.deltaTime, cameraMoveSpeed);
+            camera.processKeyboard(Camera.CameraMovement.Left, (float)Time.deltaTime, speed);
         if(Input.IsKeyDown(Keycode.D))
-            camera.processKeyboard(Camera.CameraMovement.Right, (float)Time.deltaTime, cameraMoveSpeed);
+            camera.processKeyboard(Camera.CameraMovement.Right, (float)Time.deltaTime, speed);
     }
 
     public static void main(String[] args)

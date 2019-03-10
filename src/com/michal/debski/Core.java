@@ -57,17 +57,13 @@ public class Core
 
         glfwMakeContextCurrent(window);
 
+        // V-Sync turned on
         glfwSwapInterval(1);
 
-        glfwShowWindow(window);
-
+        // Disable cursor, so it won't block at screen bounds
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-       /* glfwSetCursorPosCallback(window, (window, posX, posY) ->
-        {
-            Input.CursorPosCallback(posX, posY);
-        });*/
-
+        glfwShowWindow(window);
 
         GL.createCapabilities();
 

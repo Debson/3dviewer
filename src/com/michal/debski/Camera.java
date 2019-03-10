@@ -70,8 +70,6 @@ public class Camera
 
         void processKeyboard(CameraMovement dir, float dT, float speed)
         {
-            speed = SPEED;
-
             float velocity = speed * dT;
             Vector3f pos = new Vector3f();
             switch(dir)
@@ -97,7 +95,6 @@ public class Camera
                     break;
                 }
             }
-
         }
 
         void processMouseMovement(float offsetX, float offsetY)
@@ -111,7 +108,7 @@ public class Camera
             if(pitch > 89.f)
                 pitch = 89.f;
             if(pitch < -89.f)
-                pitch = 89.f;
+                pitch = -89.f;
 
             updateCameraVectors();
         }
@@ -128,7 +125,7 @@ public class Camera
             Front.y = (float)Math.sin(Math.toRadians(pitch));
             Front.z = (float)(Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));
             Front.normalize(front);
-            
+
             Vector3f r = new Vector3f();
             Vector3f u = new Vector3f();
             front.cross(worldUp, r).normalize();
