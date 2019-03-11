@@ -54,6 +54,11 @@ public class Scene implements GameHandlerInterface
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * 4, 6 * 4);
         glEnableVertexAttribArray(2);
+
+        String path = "assets//cube.obj";
+        String path2 = "assets//nanosuit//nanosuit.obj";
+        Loader loader = new Loader(path2);
+
     }
 
     @Override
