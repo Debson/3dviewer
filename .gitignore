@@ -1,2 +1,8 @@
-# Ext to ignore
+# Folder names to ignore
+out/
+.idea/
+assets/
+libs/
+
+# File Extensions to ignore
 *.iml
