@@ -3,13 +3,9 @@ package com.michal.debski;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryUtil;
 
-import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
-
-import org.lwjgl.glfw.GLFW.*;
 
 
 import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
@@ -24,7 +20,7 @@ public class Scene implements GameHandlerInterface
     private Matrix4f model;
     private double mouseX, mouseY, mousePrevX, mousePrevY;
     private float cameraMoveSpeed = 10.f;
-
+    private Model myCube;
 
     @Override
     public void OnWindowOpen()
@@ -50,14 +46,17 @@ public class Scene implements GameHandlerInterface
 
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * 4, 0);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * 4, 3 * 4);
+        /*glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * 4, 3 * 4);
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * 4, 6 * 4);
-        glEnableVertexAttribArray(2);
+        glEnableVertexAttribArray(2);*/
 
         String path = "assets//cube.obj";
         String path2 = "assets//nanosuit//nanosuit.obj";
-        Loader loader = new Loader(path2);
+        String path3 = "assets//teapot.obj";
+        String path4 = "assets//teddybear.obj";
+        String path5 = "assets//sword.obj";
+        myCube = new Model(path4);
 
     }
 
@@ -96,9 +95,13 @@ public class Scene implements GameHandlerInterface
 
         updateMatrices();
 
-        glBindVertexArray(vao);
+       /* glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, Vertices.cubeVertices.length);
-        glBindVertexArray(0);
+        glBindVertexArray(0);*/
+
+
+        myCube.Render();
+
     }
 
     private void updateMatrices()

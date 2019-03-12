@@ -110,6 +110,9 @@ public class Core
 
             gameHandler.OnFinishFrame();
         }
+
+        memFree(mousePosX);
+        memFree(mousePosY);
     }
 
     public void StopGame(GameHandlerInterface gameHandler)

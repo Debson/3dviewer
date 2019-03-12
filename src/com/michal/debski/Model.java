@@ -2,7 +2,7 @@ package com.michal.debski;
 
 import org.joml.Vector3f;
 
-public class Mesh
+public class Model
 {
     class Vertex
     {
@@ -11,9 +11,11 @@ public class Mesh
         Vector3f texCoords;
     }
 
-    public Mesh(String path)
-    {
+    private Loader loader;
 
+    public Model(String path)
+    {
+        loader = new Loader(path);
     }
 
 
@@ -25,5 +27,11 @@ public class Mesh
     private void mapData()
     {
 
+    }
+
+    public void Render()
+    {
+        for(Loader.mdMesh mesh : loader.meshes)
+            mesh.Render();
     }
 }

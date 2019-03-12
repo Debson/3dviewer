@@ -63,7 +63,7 @@ public class Camera
 
         Matrix4f getProjectionMatrix()
         {
-            projection = new Matrix4f().perspective((float)Math.toRadians(zoom), screenRes.x / screenRes.y, 0.1f, 100.f);
+            projection = new Matrix4f().perspective((float)Math.toRadians(zoom), screenRes.x / screenRes.y, 0.1f, 1000.f);
 
             return projection;
         }
