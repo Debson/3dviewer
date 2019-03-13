@@ -56,7 +56,7 @@ public class Scene implements GameHandlerInterface
         String path3 = "assets//teapot.obj";
         String path4 = "assets//teddybear.obj";
         String path5 = "assets//sword.obj";
-        myCube = new Model(path4);
+        myCube = new Model(path2);
 
     }
 

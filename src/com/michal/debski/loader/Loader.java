@@ -1,4 +1,4 @@
-package com.michal.debski;
+package com.michal.debski.loader;
 
 import org.lwjgl.system.MemoryUtil;
 
@@ -34,12 +34,19 @@ public class Loader
     private static final String MATERIAL                    = "usemtl";
     private static final String OBJECT                      = "o";
     private static final String GROUP                       = "g";
+    private static final String MTL_FILE                    = "mtllib";
+    private static final String USE_MATERIAL                = "usemtl";
+    private static final String MTL_MATERIAL_BIND           = "newmtl";
+    private static final String MTL_AMBIENT_MAP             = "map_Ka";
+    private static final String MTL_DIFFUSE_MAP             = "map_Kd";
+    private static final String MTL_SPECULAR_MAP            = "map_Ks";
+    private static final String MTL_HEIGHT_MAP              = "map_Bump";
     
     /*
     * Create vector of meshes, every mesh has its own attribues(vertices, texCoords, normals, name of mesh , texture? etc.)
     * Loader will have number of meshes etc.
     * */
-    class mdVertex
+    public class mdVertex
     {
         Vector3f position = new Vector3f();
         Vector3f normal = new Vector3f();
@@ -48,11 +55,20 @@ public class Loader
         Vector3f bitangen = new Vector3f();
     }
 
-    class mdMesh
+    public class mdTexture
+    {
+        int id;
+        String type;
+        String path;
+    }
+
+    public class mdMesh
     {
         public String name = "";
         public List<mdVertex> vertices = new ArrayList<mdVertex>();
         public List<Vector3i> indices      = new ArrayList<Vector3i>();
+        public List<mdTexture> textures = new ArrayList<>();
+        public String material_name = "";
         private int vao, vbo, ebo;
         private boolean hasVertices = false;
 
@@ -64,9 +80,12 @@ public class Loader
         // Class that
         public mdMesh(mdMesh other)
         {
-            this.name       = other.name;
-            this.vertices   = other.vertices;
-            this.indices    = other.indices;
+            this.name           = other.name;
+            this.vertices       = other.vertices;
+            this.indices        = other.indices;
+            this.textures       = other.textures;
+            this.material_name  = other.material_name;
+            this.hasVertices    = other.hasVertices;
             this.vao = other.vao;
             this.vbo = other.vbo;
             this.ebo = other.ebo;
@@ -119,6 +138,8 @@ public class Loader
     }
 
     public Vector<mdMesh> meshes = new Vector<mdMesh>();
+    private String mtlFilePath = new String();
+    private String directory = new String();
 
     public Loader(String path)
     {
@@ -128,6 +149,8 @@ public class Loader
         List<Float> allVertices = new ArrayList<Float>();
         List<Float> allTexCoords = new ArrayList<Float>();
         List<Float> allNormals = new ArrayList<Float>();
+        directory = path.substring(0, path.lastIndexOf('/'));
+        directory += '/';
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
@@ -200,6 +223,15 @@ public class Loader
                         }
                         break;
                     }
+                    case MTL_FILE: {
+                        mtlFilePath =  directory + values[1];
+                        break;
+                    }
+
+                    case USE_MATERIAL: {
+                        mesh.material_name = values[1];
+                        break;
+                    }
                 }
             }
 
@@ -211,41 +243,131 @@ public class Loader
             e.printStackTrace();
         }
 
-        for(int i = 0; i < meshes.size(); i++)
+        // Check if mtlFilePath contains any path
+        if(!mtlFilePath.isEmpty()) {
+            // Get info about textures used in each mesh
+            try (BufferedReader br = new BufferedReader(new FileReader(mtlFilePath))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    // Split line into words
+                    String[] values = line.split("\\s+");
+                    switch (values[0]) {
+                        case MTL_MATERIAL_BIND: {
+                            // Find mesh that uses material with that name
+                            mdMesh mesh = findMeshByMaterialName(values[1]);
+
+                            int ambientID   = 0;
+                            int diffuseID   = 0;
+                            int specularID  = 0;
+                            int heightID    = 0;
+                            // Find maps and their paths
+                            while ((line = br.readLine()) != null && !line.contains(MTL_MATERIAL_BIND)) {
+                                values = line.split("\\s+");
+                                switch (values[0]) {
+                                    case MTL_AMBIENT_MAP: {
+                                        mdTexture texture = new mdTexture();
+                                        texture.id = ambientID;
+                                        texture.path = directory + values[1];
+                                        texture.type = "ambient";
+                                        ambientID++;
+                                        mesh.textures.add(texture);
+                                        break;
+                                    }
+                                    case MTL_DIFFUSE_MAP: {
+                                        mdTexture texture = new mdTexture();
+                                        texture.id = diffuseID;
+                                        texture.path = directory + values[1];
+                                        texture.type = "diffuse";
+                                        diffuseID++;
+                                        mesh.textures.add(texture);
+                                        break;
+                                    }
+                                    case MTL_SPECULAR_MAP: {
+                                        mdTexture texture = new mdTexture();
+                                        texture.id = specularID;
+                                        texture.path = directory + values[1];
+                                        texture.type = "specular";
+                                        specularID++;
+                                        mesh.textures.add(texture);
+                                        break;
+                                    }
+                                    case MTL_HEIGHT_MAP: {
+                                        mdTexture texture = new mdTexture();
+                                        texture.id = heightID;
+                                        texture.path = values[1];
+                                        texture.type = "height";
+                                        heightID++;
+                                        mesh.textures.add(texture);
+                                        break;
+                                    }
+                                }
+
+                                // Check if the next line contains name of the next material.
+                                // If it contains, break out of the loop.
+                                // While doing that, don't move the buffer cursor,
+                                // so "mark()" and "reset()" method will be used to achieve that
+                                br.mark(2000);
+                                if((line = br.readLine()) == null || line.contains(MTL_MATERIAL_BIND))
+                                {
+                                    br.reset();
+                                    break;
+                                }
+                                br.reset();
+                            }
+                            break;
+                        }
+                    }
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Map vertices, texture coordinates and normals according to the indices of each mesh
+        for(mdMesh mesh : meshes)
         {
-            meshes.get(i).vertices.clear();
-            for(Vector3i indice : meshes.get(i).indices)
+            mesh.vertices.clear();
+            for(Vector3i index : mesh.indices)
             {
                 mdVertex vertex = new mdVertex();
                 // Get vertices
-                vertex.position.x = allVertices.get(indice.x * 3);
-                vertex.position.y = allVertices.get(indice.x * 3 + 1);
-                vertex.position.z = allVertices.get(indice.x * 3 + 2);
+                vertex.position.x = allVertices.get(index.x * 3);
+                vertex.position.y = allVertices.get(index.x * 3 + 1);
+                vertex.position.z = allVertices.get(index.x * 3 + 2);
 
                 // Process only if any texture coordinates exists
                 if(allTexCoords.isEmpty() == false)
                 {
                     // Get texture coordinates(only need 2)
-                    vertex.texCoord.x = allTexCoords.get((int) indice.z * 3);
-                    vertex.texCoord.y = allTexCoords.get((int) indice.z * 3 + 1);
+                    vertex.texCoord.x = allTexCoords.get(index.y * 2);
+                    vertex.texCoord.y = allTexCoords.get(index.y * 2 + 1);
                 }
 
                 // Process only if any normals exists
                 if(allNormals.isEmpty() == false)
                 {
                     // Get normals
-                    vertex.normal.x = allNormals.get(indice.z * 3);
-                    vertex.normal.y = allNormals.get(indice.z * 3 + 1);
-                    vertex.normal.z = allNormals.get(indice.z * 3 + 2);
+                    vertex.normal.x = allNormals.get(index.z * 3);
+                    vertex.normal.y = allNormals.get(index.z * 3 + 1);
+                    vertex.normal.z = allNormals.get(index.z * 3 + 2);
                 }
 
-                meshes.get(i).vertices.add(vertex);
+                mesh.vertices.add(vertex);
             }
-            meshes.get(i).setupMesh();
 
-            // Make sure there is no objects that have no data in the meshes container(that should never happen if .OBJ file is valid)
-            if(meshes.elementAt(i).vertices.isEmpty())
-                meshes.remove(i);
+            mesh.setupMesh();
         }
+    }
+
+    private mdMesh findMeshByMaterialName(String matName)
+    {
+        for(mdMesh mesh : meshes)
+        {
+            if(mesh.material_name.equals(matName))
+                return mesh;
+        }
+
+        return null;
     }
 }

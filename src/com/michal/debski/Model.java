@@ -1,5 +1,6 @@
 package com.michal.debski;
 
+import com.michal.debski.loader.Loader;
 import org.joml.Vector3f;
 
 public class Model
