@@ -1,5 +1,6 @@
 package com.michal.debski.loader;
 
+import com.michal.debski.Shader;
 import org.lwjgl.system.MemoryUtil;
 
 import java.io.BufferedReader;
@@ -27,6 +28,7 @@ import static org.lwjgl.system.MemoryUtil.memFree;
 
 public class Loader
 {
+    private static final int    FLOAT_SIZE                  = 4;        // Float size is 4 bytes on 64bit on Windows 10 65bit platform
     private static final String VERTEX                      = "v";
     private static final String VERTEX_TEXTURE_COORDINATE   = "vt";
     private static final String VERTEX_NORMAL               = "vn";
@@ -51,8 +53,6 @@ public class Loader
         Vector3f position = new Vector3f();
         Vector3f normal = new Vector3f();
         Vector2f texCoord = new Vector2f();
-        Vector3f tangent = new Vector3f();
-        Vector3f bitangen = new Vector3f();
     }
 
     public class mdTexture
@@ -71,6 +71,9 @@ public class Loader
         public String material_name = "";
         private int vao, vbo, ebo;
         private boolean hasVertices = false;
+        private boolean hasTexCoods = false;
+        private boolean hasNormals = false;
+
 
         public mdMesh()
         {
@@ -86,6 +89,8 @@ public class Loader
             this.textures       = other.textures;
             this.material_name  = other.material_name;
             this.hasVertices    = other.hasVertices;
+            this.hasTexCoods    = other.hasTexCoods;
+            this.hasNormals     = other.hasTexCoods;
             this.vao = other.vao;
             this.vbo = other.vbo;
             this.ebo = other.ebo;
@@ -93,17 +98,26 @@ public class Loader
 
         public void setupMesh()
         {
-            float[] vertsArray = new float[vertices.size() * 3];
+            // Multiplied by 8, because 3 position vertices, 3 normals, 2 texture coordinates
+            float[] vertsArray = new float[vertices.size() * 8];
 
             int posIndex = 0;
             try
             {
                 for (int i = 0; i < vertices.size(); i++)
                 {
-                    vertsArray[posIndex] = vertices.get(i).position.x;
+                    vertsArray[posIndex + 0] = vertices.get(i).position.x;
                     vertsArray[posIndex + 1] = vertices.get(i).position.y;
                     vertsArray[posIndex + 2] = vertices.get(i).position.z;
-                    posIndex += 3;
+
+                    vertsArray[posIndex + 3] = vertices.get(i).normal.x;
+                    vertsArray[posIndex + 4] = vertices.get(i).normal.y;
+                    vertsArray[posIndex + 5] = vertices.get(i).normal.z;
+
+                    vertsArray[posIndex + 6] = vertices.get(i).texCoord.x;
+                    vertsArray[posIndex + 7] = vertices.get(i).texCoord.y;
+
+                    posIndex += 8;
                 }
             }
             catch(BufferOverflowException e)
@@ -122,12 +136,32 @@ public class Loader
             glBufferData(GL_ARRAY_BUFFER, verts, GL_STATIC_DRAW);
             memFree(verts);
 
-            glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * 4, 0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * FLOAT_SIZE, 0);
             glEnableVertexAttribArray(0);
+            glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * FLOAT_SIZE, 3 * FLOAT_SIZE);
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 2, GL_FLOAT, false, 8 * FLOAT_SIZE, 6 * FLOAT_SIZE);
+            glEnableVertexAttribArray(2);
         }
 
-        public void Render()
+        public void Render(Shader shader)
         {
+            int diffuseNr   = 1;
+            int specularNr  = 1;
+            int normalNr    = 1;
+            int heightNr    = 1;
+            for(int i = 0; i < textures.size(); i++)
+            {
+                mdTexture texture = textures.get(i);
+                glActiveTexture(GL_TEXTURE0 + i);
+                String name = texture.type;
+
+
+                // TODO: problem with accessing ShaderManager methods from Shader class object
+                glBindTexture(GL_TEXTURE_2D, textures.get(i).id);
+            }
+
+
             glBindVertexArray(vao);
             //glDrawElements(GL_TRIANGLES,  indices.size(), GL_UNSIGNED_INT, 0);
             glDrawArrays(GL_TRIANGLES, 0, vertices.size());
@@ -166,18 +200,20 @@ public class Loader
                     case VERTEX: {
                         for(int i = 1; i < values.length; i++) {
                             allVertices.add(Float.parseFloat(values[i]));
-                            mesh.hasVertices = true;
+                        mesh.hasVertices = true;
                         }
                         break;
                     }
                     case VERTEX_TEXTURE_COORDINATE: {
                         for(int i = 1; i < values.length; i++)
                             allTexCoords.add(Float.parseFloat(values[i]));
+                        mesh.hasTexCoods = true;
                         break;
                     }
                     case VERTEX_NORMAL: {
                         for(int i = 1; i < values.length; i++)
                             allNormals.add(Float.parseFloat(values[i]));
+                        mesh.hasNormals = true;
                         break;
                     }
                     case OBJECT: {
@@ -256,47 +292,40 @@ public class Loader
                             // Find mesh that uses material with that name
                             mdMesh mesh = findMeshByMaterialName(values[1]);
 
-                            int ambientID   = 0;
-                            int diffuseID   = 0;
-                            int specularID  = 0;
-                            int heightID    = 0;
+
                             // Find maps and their paths
                             while ((line = br.readLine()) != null && !line.contains(MTL_MATERIAL_BIND)) {
                                 values = line.split("\\s+");
                                 switch (values[0]) {
                                     case MTL_AMBIENT_MAP: {
                                         mdTexture texture = new mdTexture();
-                                        texture.id = ambientID;
                                         texture.path = directory + values[1];
+                                        texture.id = Image.LoadImage(texture.path);
                                         texture.type = "ambient";
-                                        ambientID++;
                                         mesh.textures.add(texture);
                                         break;
                                     }
                                     case MTL_DIFFUSE_MAP: {
                                         mdTexture texture = new mdTexture();
-                                        texture.id = diffuseID;
                                         texture.path = directory + values[1];
+                                        texture.id = Image.LoadImage(texture.path);
                                         texture.type = "diffuse";
-                                        diffuseID++;
                                         mesh.textures.add(texture);
                                         break;
                                     }
                                     case MTL_SPECULAR_MAP: {
                                         mdTexture texture = new mdTexture();
-                                        texture.id = specularID;
                                         texture.path = directory + values[1];
+                                        texture.id = Image.LoadImage(texture.path);
                                         texture.type = "specular";
-                                        specularID++;
                                         mesh.textures.add(texture);
                                         break;
                                     }
                                     case MTL_HEIGHT_MAP: {
                                         mdTexture texture = new mdTexture();
-                                        texture.id = heightID;
-                                        texture.path = values[1];
+                                        texture.path = directory + values[1];
+                                        texture.id = Image.LoadImage(texture.path);
                                         texture.type = "height";
-                                        heightID++;
                                         mesh.textures.add(texture);
                                         break;
                                     }
@@ -332,6 +361,8 @@ public class Loader
             {
                 mdVertex vertex = new mdVertex();
                 // Get vertices
+                // Multiplied by 3, because there is *index.size()* triangles,
+                // which means *index.size() * 3* vertices
                 vertex.position.x = allVertices.get(index.x * 3);
                 vertex.position.y = allVertices.get(index.x * 3 + 1);
                 vertex.position.z = allVertices.get(index.x * 3 + 2);
@@ -340,6 +371,7 @@ public class Loader
                 if(allTexCoords.isEmpty() == false)
                 {
                     // Get texture coordinates(only need 2)
+                    // TODO: this must be wrong...
                     vertex.texCoord.x = allTexCoords.get(index.y * 2);
                     vertex.texCoord.y = allTexCoords.get(index.y * 2 + 1);
                 }

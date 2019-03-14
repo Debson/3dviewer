@@ -4,7 +4,7 @@ import org.joml.Matrix4f;
 
 public class Shader extends ShaderManager
 {
-    Shader(String vertexCode, String fragmentCode)
+    public Shader(String vertexCode, String fragmentCode)
     {
         super(vertexCode, fragmentCode);
 

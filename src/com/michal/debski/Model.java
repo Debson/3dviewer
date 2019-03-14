@@ -30,9 +30,9 @@ public class Model
 
     }
 
-    public void Render()
+    public void Render(Shader shader)
     {
         for(Loader.mdMesh mesh : loader.meshes)
-            mesh.Render();
+            mesh.Render(shader);
     }
 }
