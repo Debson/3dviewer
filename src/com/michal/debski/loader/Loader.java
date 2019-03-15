@@ -1,6 +1,7 @@
 package com.michal.debski.loader;
 
 import com.michal.debski.Shader;
+import com.michal.debski.Vertices;
 import org.lwjgl.system.MemoryUtil;
 
 import java.io.BufferedReader;
@@ -28,7 +29,7 @@ import static org.lwjgl.system.MemoryUtil.memFree;
 
 public class Loader
 {
-    private static final int    FLOAT_SIZE                  = 4;        // Float size is 4 bytes on 64bit on Windows 10 65bit platform
+    public static final int    FLOAT_SIZE                  = 4;        // Float size is 4 bytes on 64bit on Windows 10 65bit platform
     private static final String VERTEX                      = "v";
     private static final String VERTEX_TEXTURE_COORDINATE   = "vt";
     private static final String VERTEX_NORMAL               = "vn";
@@ -37,17 +38,31 @@ public class Loader
     private static final String OBJECT                      = "o";
     private static final String GROUP                       = "g";
     private static final String MTL_FILE                    = "mtllib";
+
     private static final String USE_MATERIAL                = "usemtl";
     private static final String MTL_MATERIAL_BIND           = "newmtl";
     private static final String MTL_AMBIENT_MAP             = "map_Ka";
     private static final String MTL_DIFFUSE_MAP             = "map_Kd";
     private static final String MTL_SPECULAR_MAP            = "map_Ks";
     private static final String MTL_HEIGHT_MAP              = "map_Bump";
+
+    public static final String AMBIENT_MAP                 = "ambient";
+    public static final String DIFFUSE_MAP                 = "diffuse";
+    public static final String SPECULAR_MAP                = "specular";
+    public static final String NORMAL_MAP                  = "normal";
+    public static final String HEIGHT_MAP                  = "height";
     
     /*
     * Create vector of meshes, every mesh has its own attribues(vertices, texCoords, normals, name of mesh , texture? etc.)
     * Loader will have number of meshes etc.
     * */
+    public enum PrimitiveType
+    {
+        Cube,
+        Plane
+    };
+
+
     public class mdVertex
     {
         Vector3f position = new Vector3f();
@@ -62,114 +77,7 @@ public class Loader
         String path;
     }
 
-    public class mdMesh
-    {
-        public String name = "";
-        public List<mdVertex> vertices = new ArrayList<mdVertex>();
-        public List<Vector3i> indices      = new ArrayList<Vector3i>();
-        public List<mdTexture> textures = new ArrayList<>();
-        public String material_name = "";
-        private int vao, vbo, ebo;
-        private boolean hasVertices = false;
-        private boolean hasTexCoods = false;
-        private boolean hasNormals = false;
 
-
-        public mdMesh()
-        {
-
-        }
-
-        // Class that
-        public mdMesh(mdMesh other)
-        {
-            this.name           = other.name;
-            this.vertices       = other.vertices;
-            this.indices        = other.indices;
-            this.textures       = other.textures;
-            this.material_name  = other.material_name;
-            this.hasVertices    = other.hasVertices;
-            this.hasTexCoods    = other.hasTexCoods;
-            this.hasNormals     = other.hasTexCoods;
-            this.vao = other.vao;
-            this.vbo = other.vbo;
-            this.ebo = other.ebo;
-        }
-
-        public void setupMesh()
-        {
-            // Multiplied by 8, because 3 position vertices, 3 normals, 2 texture coordinates
-            float[] vertsArray = new float[vertices.size() * 8];
-
-            int posIndex = 0;
-            try
-            {
-                for (int i = 0; i < vertices.size(); i++)
-                {
-                    vertsArray[posIndex + 0] = vertices.get(i).position.x;
-                    vertsArray[posIndex + 1] = vertices.get(i).position.y;
-                    vertsArray[posIndex + 2] = vertices.get(i).position.z;
-
-                    vertsArray[posIndex + 3] = vertices.get(i).normal.x;
-                    vertsArray[posIndex + 4] = vertices.get(i).normal.y;
-                    vertsArray[posIndex + 5] = vertices.get(i).normal.z;
-
-                    vertsArray[posIndex + 6] = vertices.get(i).texCoord.x;
-                    vertsArray[posIndex + 7] = vertices.get(i).texCoord.y;
-
-                    posIndex += 8;
-                }
-            }
-            catch(BufferOverflowException e)
-            {
-                System.out.println("Exception throws: " + e);
-            }
-
-            // Create a float buffer, which can passed through OpenGL API to the GPU
-            FloatBuffer verts = MemoryUtil.memAllocFloat(vertsArray.length);
-            verts.put(vertsArray).flip();
-
-            vao = glGenVertexArrays();
-            glBindVertexArray(vao);
-            vbo = glGenBuffers();
-            glBindBuffer(GL_ARRAY_BUFFER, vbo);
-            glBufferData(GL_ARRAY_BUFFER, verts, GL_STATIC_DRAW);
-            memFree(verts);
-
-            glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * FLOAT_SIZE, 0);
-            glEnableVertexAttribArray(0);
-            glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * FLOAT_SIZE, 3 * FLOAT_SIZE);
-            glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 2, GL_FLOAT, false, 8 * FLOAT_SIZE, 6 * FLOAT_SIZE);
-            glEnableVertexAttribArray(2);
-        }
-
-        public void Render(Shader shader)
-        {
-            int diffuseNr   = 1;
-            int specularNr  = 1;
-            int normalNr    = 1;
-            int heightNr    = 1;
-            for(int i = 0; i < textures.size(); i++)
-            {
-                mdTexture texture = textures.get(i);
-                glActiveTexture(GL_TEXTURE0 + i);
-                String name = texture.type;
-
-
-                // TODO: problem with accessing ShaderManager methods from Shader class object
-                glBindTexture(GL_TEXTURE_2D, textures.get(i).id);
-            }
-
-
-            glBindVertexArray(vao);
-            //glDrawElements(GL_TRIANGLES,  indices.size(), GL_UNSIGNED_INT, 0);
-            glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-            glBindVertexArray(0);
-
-        }
-
-    }
 
     public Vector<mdMesh> meshes = new Vector<mdMesh>();
     private String mtlFilePath = new String();
@@ -301,7 +209,7 @@ public class Loader
                                         mdTexture texture = new mdTexture();
                                         texture.path = directory + values[1];
                                         texture.id = Image.LoadImage(texture.path);
-                                        texture.type = "ambient";
+                                        texture.type = AMBIENT_MAP;
                                         mesh.textures.add(texture);
                                         break;
                                     }
@@ -309,7 +217,7 @@ public class Loader
                                         mdTexture texture = new mdTexture();
                                         texture.path = directory + values[1];
                                         texture.id = Image.LoadImage(texture.path);
-                                        texture.type = "diffuse";
+                                        texture.type = DIFFUSE_MAP;
                                         mesh.textures.add(texture);
                                         break;
                                     }
@@ -317,7 +225,7 @@ public class Loader
                                         mdTexture texture = new mdTexture();
                                         texture.path = directory + values[1];
                                         texture.id = Image.LoadImage(texture.path);
-                                        texture.type = "specular";
+                                        texture.type = SPECULAR_MAP;
                                         mesh.textures.add(texture);
                                         break;
                                     }
@@ -325,7 +233,7 @@ public class Loader
                                         mdTexture texture = new mdTexture();
                                         texture.path = directory + values[1];
                                         texture.id = Image.LoadImage(texture.path);
-                                        texture.type = "height";
+                                        texture.type = HEIGHT_MAP;
                                         mesh.textures.add(texture);
                                         break;
                                     }
@@ -392,6 +300,24 @@ public class Loader
         }
     }
 
+    public Loader(PrimitiveType type)
+    {
+        mdMesh mesh = new mdMesh();
+        switch(type)
+        {
+            case Cube: {
+                mesh.vertices = arrayToMDVertex(Vertices.cubeVertices, 8);
+                break;
+            }
+            case Plane: {
+                mesh.vertices = arrayToMDVertex(Vertices.planeVertices, 8);
+                break;
+            }
+        }
+        mesh.setupMesh();
+        meshes.add(mesh);
+    }
+
     private mdMesh findMeshByMaterialName(String matName)
     {
         for(mdMesh mesh : meshes)
@@ -401,5 +327,30 @@ public class Loader
         }
 
         return null;
+    }
+
+    private List<mdVertex> arrayToMDVertex(float[] vertices, int stride)
+    {
+        List<mdVertex> verticesList = new ArrayList<>();
+
+        for(int i = 0; i < vertices.length; i += stride)
+        {
+            mdVertex vertex = new mdVertex();
+
+            vertex.position.x = vertices[i + 0];
+            vertex.position.y = vertices[i + 1];
+            vertex.position.z = vertices[i + 2];
+
+            vertex.normal.x = vertices[i + 3];
+            vertex.normal.y = vertices[i + 4];
+            vertex.normal.z = vertices[i + 5];
+
+            vertex.texCoord.x = vertices[i + 6];
+            vertex.texCoord.y = vertices[i + 7];
+
+            verticesList.add(vertex);
+        }
+
+        return verticesList;
     }
 }

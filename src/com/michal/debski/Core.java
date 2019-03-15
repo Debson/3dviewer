@@ -27,47 +27,15 @@ public class Core
         if(!glfwInit())
             throw new IllegalStateException("Cannot initialize GLFW");
 
-        glfwDefaultWindowHints();
-        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-
         window = glfwCreateWindow(windowProperties.getWidth(), windowProperties.getHeight(), "model_loader", NULL, NULL);
         if(window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
-        glfwSetKeyCallback(window, (window, key, scancode, action, mods) ->
-        {
-                if(key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                    glfwSetWindowShouldClose(window, true);
-                Input.UpdateKeyState(key, action);
-        });
+        setupGLFW();
 
-        try(MemoryStack stack = stackPush())
-        {
-            IntBuffer pWidth = stack.mallocInt(1);
-            IntBuffer pHeight = stack.mallocInt(1);
+        setupOpenGL();
 
-            glfwGetWindowSize(window, pWidth, pHeight);
-
-            GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
-            glfwSetWindowPos(window, (vidMode.width() - pWidth.get(0)) / 2,
-                                     (vidMode.height() - pHeight.get(0)) / 2);
-        }
-
-        glfwMakeContextCurrent(window);
-
-        // V-Sync turned on
-        glfwSwapInterval(1);
-
-        // Disable cursor, so it won't block at screen bounds
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-        glfwShowWindow(window);
-
-        GL.createCapabilities();
-
-        // Display information about system
+        // Display information about the system
         System.out.println("Vendor:         " + GL11.glGetString(GL11.GL_VENDOR));
         System.out.println("Renderer:       " + GL11.glGetString(GL11.GL_RENDERER));
         System.out.println("Version:        " + GL11.glGetString(GL11.GL_VERSION));
@@ -100,11 +68,9 @@ public class Core
             glfwGetCursorPos(window, mousePosX, mousePosY);
             Input.CursorPosCallback(mousePosX.get(0), mousePosY.get(0));
 
-
             gameHandler.OnRealtimeUpdate();
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
             gameHandler.OnRealTimeRender();
             glfwSwapBuffers(window);
 
@@ -129,5 +95,49 @@ public class Core
 
         glfwTerminate();
         glfwSetErrorCallback(null).free();
+    }
+
+    private void setupGLFW()
+    {
+        glfwDefaultWindowHints();
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+        glfwSetKeyCallback(window, (window, key, scancode, action, mods) ->
+        {
+            if(key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
+                glfwSetWindowShouldClose(window, true);
+            Input.UpdateKeyState(key, action);
+        });
+
+        try(MemoryStack stack = stackPush())
+        {
+            IntBuffer pWidth = stack.mallocInt(1);
+            IntBuffer pHeight = stack.mallocInt(1);
+
+            glfwGetWindowSize(window, pWidth, pHeight);
+
+            GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+            glfwSetWindowPos(window, (vidMode.width() - pWidth.get(0)) / 2,
+                    (vidMode.height() - pHeight.get(0)) / 2);
+        }
+
+        glfwMakeContextCurrent(window);
+
+        // V-Sync turned on
+        glfwSwapInterval(1);
+
+        // Disable cursor, so it won't block at screen bounds
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+        glfwShowWindow(window);
+
+        GL.createCapabilities();
+    }
+
+    private void setupOpenGL()
+    {
+        glEnable(GL_DEPTH_TEST);
     }
 }

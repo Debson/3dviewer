@@ -1,38 +1,34 @@
 package com.michal.debski;
 
 import com.michal.debski.loader.Loader;
-import org.joml.Vector3f;
+import com.michal.debski.loader.mdMesh;
+import com.michal.debski.utilities.Color;
 
-public class Model
+public class Model extends Loader
 {
-    class Vertex
-    {
-        Vector3f position;
-        Vector3f normal;
-        Vector3f texCoords;
-    }
-
-    private Loader loader;
+    private Color color = new Color(1.f);
 
     public Model(String path)
     {
-        loader = new Loader(path);
+        super(path);
     }
 
-
-    private void loadData()
+    public Model(PrimitiveType type)
     {
-
+        super(type);
     }
 
-    private void mapData()
+    public void setColor(Color color)
     {
-
+        this.color = color;
     }
 
     public void Render(Shader shader)
     {
-        for(Loader.mdMesh mesh : loader.meshes)
+        for(mdMesh mesh : super.meshes)
+        {
+            shader.setVec4("color", color.r, color.g, color.b, color.a);
             mesh.Render(shader);
+        }
     }
 }

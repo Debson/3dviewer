@@ -50,50 +50,50 @@ public class ShaderManager
             System.out.println("Could not create a Shader Program");
     }
 
-    protected void use()
+    public void use()
     {
         glUseProgram(programID);
     }
 
-    protected void setBool(String name, boolean value)
+    public void setBool(String name, boolean value)
     {
         glUniform1i(glGetUniformLocation(programID, name), value == true ? 1 : 0);
     }
-    protected  void setInt(String name, int value)
+    public  void setInt(String name, int value)
     {
         glUniform1i(glGetUniformLocation(programID, name), value);
     }
-    protected void setFloat(String name, float value)
+    public void setFloat(String name, float value)
     {
         glUniform1f(glGetUniformLocation(programID, name), value);
     }
-    protected void setVec2(String name, Vector2f value)
+    public void setVec2(String name, Vector2f value)
     {
         glUniform2f(glGetUniformLocation(programID, name), value.x, value.y);
     }
-    protected void setVec2(String name, float x, float y)
+    public void setVec2(String name, float x, float y)
     {
         glUniform2f(glGetUniformLocation(programID, name), x, y);
     }
-    protected void setVec3(String name, Vector3f value)
+    public void setVec3(String name, Vector3f value)
     {
         glUniform3f(glGetUniformLocation(programID, name), value.x, value.y, value.z);
     }
-    protected void setVec3(String name, float x, float y, float z)
+    public void setVec3(String name, float x, float y, float z)
     {
         glUniform3f(glGetUniformLocation(programID, name), x, y, z);
     }
-    protected void setVec4(String name, Vector4f value)
+    public void setVec4(String name, Vector4f value)
     {
         glUniform4f(glGetUniformLocation(programID, name), value.x, value.y, value.z, value.w);
     }
 
-    protected  void setVec4(String name, float x, float y, float z, float w)
+    public  void setVec4(String name, float x, float y, float z, float w)
     {
         glUniform4f(glGetUniformLocation(programID, name), x, y, z, w);
     }
 
-    protected void setMat4(String name, Matrix4f mat)
+    public void setMat4(String name, Matrix4f mat)
     {
         try(MemoryStack stack = MemoryStack.stackPush()) {
             FloatBuffer fb = stack.mallocFloat(16);

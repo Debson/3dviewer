@@ -1,5 +1,7 @@
 package com.michal.debski;
 
+import com.michal.debski.loader.Loader;
+import com.michal.debski.utilities.Color;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -20,7 +22,7 @@ public class Scene implements GameHandlerInterface
     private Matrix4f model;
     private double mouseX, mouseY, mousePrevX, mousePrevY;
     private float cameraMoveSpeed = 10.f;
-    private Model myCube;
+    private Model myCube, floor;
 
     @Override
     public void OnWindowOpen()
@@ -56,7 +58,11 @@ public class Scene implements GameHandlerInterface
         String path3 = "assets//teapot.obj";
         String path4 = "assets//teddybear.obj";
         String path5 = "assets//sword.obj";
+
         myCube = new Model(path2);
+        floor = new Model(Loader.PrimitiveType.Plane);
+        floor.setColor(new Color(1.f, 0.f, 0.f, 1.f));
+
 
     }
 
@@ -100,7 +106,8 @@ public class Scene implements GameHandlerInterface
         glBindVertexArray(0);*/
 
 
-        myCube.Render();
+        myCube.Render(shader);
+        floor.Render(shader);
 
     }
 
