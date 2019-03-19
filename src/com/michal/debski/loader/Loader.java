@@ -51,6 +51,11 @@ public class Loader
     public static final String SPECULAR_MAP                = "specular";
     public static final String NORMAL_MAP                  = "normal";
     public static final String HEIGHT_MAP                  = "height";
+
+    public static final String MATERIAL_AMBIENT            = "Ka";
+    public static final String MATERIAL_DIFFUSE            = "Kd";
+    public static final String MATERIAL_SPECULAR           = "Ks";
+
     
     /*
     * Create vector of meshes, every mesh has its own attribues(vertices, texCoords, normals, name of mesh , texture? etc.)
@@ -76,7 +81,6 @@ public class Loader
         String type;
         String path;
     }
-
 
 
     public Vector<mdMesh> meshes = new Vector<mdMesh>();
@@ -237,6 +241,20 @@ public class Loader
                                         mesh.textures.add(texture);
                                         break;
                                     }
+                                    case MATERIAL_AMBIENT: {
+                                        mesh.material.ambient = Float.parseFloat(values[1]);
+                                        break;
+                                    }
+
+                                    case MATERIAL_DIFFUSE: {
+                                        mesh.material.diffuse = Float.parseFloat(values[1]);
+                                        break;
+                                    }
+
+                                    case MATERIAL_SPECULAR: {
+                                        mesh.material.specular = Float.parseFloat(values[1]);
+                                        break;
+                                    }
                                 }
 
                                 // Check if the next line contains name of the next material.
@@ -314,6 +332,7 @@ public class Loader
                 break;
             }
         }
+        mesh.material = new mdMaterial(0.05f, 0.1f, 0.1f);
         mesh.setupMesh();
         meshes.add(mesh);
     }

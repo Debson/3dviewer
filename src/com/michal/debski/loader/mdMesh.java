@@ -1,6 +1,7 @@
 package com.michal.debski.loader;
 
 import com.michal.debski.Shader;
+import com.michal.debski.ShaderManager;
 import org.joml.Vector3i;
 import org.lwjgl.system.MemoryUtil;
 
@@ -27,11 +28,14 @@ import static org.lwjgl.system.MemoryUtil.memFree;
 
 public class mdMesh
 {
+
     public String name = "";
     public List<Loader.mdVertex> vertices = new ArrayList<Loader.mdVertex>();
     public List<Vector3i> indices      = new ArrayList<Vector3i>();
     public List<Loader.mdTexture> textures = new ArrayList<>();
     public String material_name = "";
+    public mdMaterial material = new mdMaterial(1.f);
+
     private int vao, vbo, ebo;
     public boolean hasVertices = false;
     public boolean hasTexCoods = false;
@@ -54,6 +58,7 @@ public class mdMesh
         this.hasVertices    = other.hasVertices;
         this.hasTexCoods    = other.hasTexCoods;
         this.hasNormals     = other.hasTexCoods;
+        this.material       = other.material;
         this.vao = other.vao;
         this.vbo = other.vbo;
         this.ebo = other.ebo;
@@ -107,7 +112,7 @@ public class mdMesh
         glEnableVertexAttribArray(2);
     }
 
-    public void Render(Shader shader)
+    public void Render()
     {
         int ambientNr   = 1;
         int diffuseNr   = 1;
@@ -119,7 +124,7 @@ public class mdMesh
         {
             Loader.mdTexture texture = textures.get(i);
             glActiveTexture(GL_TEXTURE0 + i);
-            String name = texture.type;
+            /*String name = texture.type;
             int num = 0;
             if(name.equals(AMBIENT_MAP))
             {
@@ -139,13 +144,18 @@ public class mdMesh
             }
             else if(name.equals(HEIGHT_MAP)) {
                 num = heightNr++;
-            }
+            }*/
 
-            shader.setInt("material." + texture.type, i);
+            ShaderManager.GetShader().setInt("material." + texture.type + "Map", i);
 
-            // TODO: problem with accessing ShaderManager methods from Shader class object
+            // TODO: problem with accessing mdShader methods from Shader class object
             glBindTexture(GL_TEXTURE_2D, textures.get(i).id);
         }
+
+        ShaderManager.GetShader().setFloat("material.ambientStrength", material.ambient);
+        ShaderManager.GetShader().setFloat("material.diffuseStrength", material.diffuse);
+        ShaderManager.GetShader().setFloat("material.specularStrength", material.specular);
+
 
         glBindVertexArray(vao);
         //glDrawElements(GL_TRIANGLES,  indices.size(), GL_UNSIGNED_INT, 0);

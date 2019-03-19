@@ -1,5 +1,6 @@
 package com.michal.debski;
 
+import com.michal.debski.environment.DirectionalLight;
 import com.michal.debski.loader.Loader;
 import com.michal.debski.utilities.Color;
 import org.joml.Matrix4f;
@@ -18,11 +19,12 @@ public class Scene implements GameHandlerInterface
 {
     private Shader shader;
     private Camera camera;
+    private DirectionalLight dirLight;
     private int vao, vbo;
     private Matrix4f model;
     private double mouseX, mouseY, mousePrevX, mousePrevY;
     private float cameraMoveSpeed = 10.f;
-    private Model myCube, floor;
+    private Model myModel, floor;
 
     @Override
     public void OnWindowOpen()
@@ -59,11 +61,12 @@ public class Scene implements GameHandlerInterface
         String path4 = "assets//teddybear.obj";
         String path5 = "assets//sword.obj";
 
-        myCube = new Model(path2);
+        myModel = new Model(path2);
+        //myModel.setColor(new Color(1.f, 0.5f, 1.f));
         floor = new Model(Loader.PrimitiveType.Plane);
         floor.setColor(new Color(1.f, 0.f, 0.f, 1.f));
 
-
+        dirLight = new DirectionalLight(new Vector3f(20.f, 30.f, 15.f), new Color(2.f));
     }
 
     @Override
@@ -106,8 +109,11 @@ public class Scene implements GameHandlerInterface
         glBindVertexArray(0);*/
 
 
-        myCube.Render(shader);
-        floor.Render(shader);
+        ShaderManager.SetShader(shader);
+
+        dirLight.Render();
+        myModel.Render();
+        floor.Render();
 
     }
 

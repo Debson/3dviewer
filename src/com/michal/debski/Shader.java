@@ -2,7 +2,7 @@ package com.michal.debski;
 
 import org.joml.Matrix4f;
 
-public class Shader extends ShaderManager
+public class Shader extends mdShader
 {
     public Shader(String vertexCode, String fragmentCode)
     {
