@@ -1,5 +1,6 @@
 package com.michal.debski.environment;
 
+import com.michal.debski.ShaderManager;
 import com.michal.debski.utilities.Color;
 import org.joml.Vector3f;
 
@@ -15,5 +16,18 @@ public class DirectionalLight extends Light
     {
         super(position, color);
         super.on();
+    }
+
+    public void Render(Vector3f cameraPosition)
+    {
+        super.renderLight();
+
+        if(lightActive)
+        {
+            ShaderManager.GetShader().setVec3("viewPos", cameraPosition);
+            ShaderManager.GetShader().setVec3("dirLight.direction", position);
+            //ShaderManager.GetShader().setVec3("lightPos", position);
+            ShaderManager.GetShader().setVec3("dirLight.color", color.r, color.g, color.b);
+        }
     }
 }

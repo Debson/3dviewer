@@ -133,9 +133,9 @@ enum Keycode
 	RShift(GLFW_KEY_RIGHT_SHIFT),
 	RAlt(GLFW_KEY_RIGHT_ALT),
 
-	MouseLeft(GLFW_KEY_RIGHT_ALT + 1),
-	MouseRight(GLFW_KEY_RIGHT_ALT + 2),
-	MouseMiddle(GLFW_KEY_RIGHT_ALT + 3),
+	MouseLeft(GLFW_MOUSE_BUTTON_LEFT),
+	MouseRight(GLFW_MOUSE_BUTTON_RIGHT),
+	MouseMiddle(GLFW_MOUSE_BUTTON_MIDDLE),
 
 	MouseWheelUp(GLFW_KEY_RIGHT_ALT + 4),
 	MouseWheelDown(GLFW_KEY_RIGHT_ALT + 5),

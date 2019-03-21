@@ -13,10 +13,10 @@ public class Light
     // This should be the parent class. Child classes: directional light, point light
     // Light method render should be called before any drawing, so it will set boolean variable
     // that manages lighting in shader to true, so the scene will be drawn with lighting.
-    private Vector3f position;
-    private float strength;
-    private Color color;
-    private boolean lightActive = true;
+    protected Vector3f position;
+    protected float strength;
+    protected Color color;
+    protected boolean lightActive = true;
     private boolean renderLightCube = true;
     private Model cube = new Model(Loader.PrimitiveType.Cube);
 
@@ -53,7 +53,18 @@ public class Light
         this.renderLightCube = val;
     }
 
-    public void Render()
+    public void Render(Vector3f cameraPosition)
+    {
+        renderLight();
+        if(lightActive)
+        {
+            ShaderManager.GetShader().setVec3("light.direction", position);
+            //ShaderManager.GetShader().setVec3("lightPos", position);
+            ShaderManager.GetShader().setVec3("light.color", color.r, color.g, color.b);
+        }
+    }
+
+    protected void renderLight()
     {
         if(renderLightCube)
         {
@@ -64,11 +75,5 @@ public class Light
         }
 
         ShaderManager.GetShader().setBool("lightActive", lightActive);
-        if(lightActive)
-        {
-            ShaderManager.GetShader().setVec3("light.direction", position);
-            //ShaderManager.GetShader().setVec3("lightPos", position);
-            ShaderManager.GetShader().setVec3("light.color", color.r, color.g, color.b);
-        }
     }
 }

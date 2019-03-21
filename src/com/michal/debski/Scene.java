@@ -35,7 +35,7 @@ public class Scene implements GameHandlerInterface
         camera = new Camera(new Vector2f(
                 WindowProperties.getWidth(),
                 WindowProperties.getHeight()),
-                new Vector3f(0.f, 0.f, 7.f));
+                new Vector3f(0.f, 15.f, 30.f));
 
         FloatBuffer verts = MemoryUtil.memAllocFloat(Vertices.cubeVertices.length);
         verts.put(Vertices.cubeVertices).flip();
@@ -55,18 +55,22 @@ public class Scene implements GameHandlerInterface
         glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * 4, 6 * 4);
         glEnableVertexAttribArray(2);*/
 
-        String path = "assets//cube.obj";
-        String path2 = "assets//nanosuit//nanosuit.obj";
-        String path3 = "assets//teapot.obj";
-        String path4 = "assets//teddybear.obj";
-        String path5 = "assets//sword.obj";
+
+        // Remember to use "\\" directory delimiter! Otherwise there will be an error.
+        String path = "assets\\cube.obj";
+        String path2 = "assets\\nanosuit\\nanosuit.obj";
+        String path3 = "assets\\teapot.obj";
+        String path4 = "assets\\teddybear.obj";
 
         myModel = new Model(path2);
+        myModel.setPosition(new Vector3f(0.f, 0.f, 0.f));
         //myModel.setColor(new Color(1.f, 0.5f, 1.f));
         floor = new Model(Loader.PrimitiveType.Plane);
         floor.setColor(new Color(1.f, 0.f, 0.f, 1.f));
 
-        dirLight = new DirectionalLight(new Vector3f(20.f, 30.f, 15.f), new Color(2.f));
+        //camera.lockCameraAt(myModel.getPosition(), true);
+
+        dirLight = new DirectionalLight(new Vector3f(20.f, 30.f, 15.f), new Color( 1.5f));
     }
 
     @Override
@@ -94,7 +98,6 @@ public class Scene implements GameHandlerInterface
 
         if(Input.IsKeyPressed(Keycode.E))
             System.out.println("EEEEEE");
-
     }
 
     @Override
@@ -104,17 +107,18 @@ public class Scene implements GameHandlerInterface
 
         updateMatrices();
 
-       /* glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, Vertices.cubeVertices.length);
-        glBindVertexArray(0);*/
-
-
         ShaderManager.SetShader(shader);
-
-        dirLight.Render();
+        dirLight.Render(camera.position);
         myModel.Render();
         floor.Render();
 
+    }
+
+    @Override
+    public void OnFileDrop(String pathOfDroppedFile)
+    {
+        myModel = null;
+        myModel = new Model(pathOfDroppedFile);
     }
 
     private void updateMatrices()
@@ -131,7 +135,8 @@ public class Scene implements GameHandlerInterface
         /*if(relMousePos.x != 0) System.out.println(relMousePos.x);
         if(relMousePos.y != 0) System.out.println(relMousePos.y);*/
 
-        camera.processMouseMovement(relMousePos.x, relMousePos.y);
+        if(Input.IsKeyDown(Keycode.MouseMiddle))
+            camera.processMouseMovement(relMousePos.x, relMousePos.y);
 
         float speed = cameraMoveSpeed;
 

@@ -29,6 +29,11 @@ public class Camera
         private Matrix4f projection;
         private Matrix4f  view;
         private Vector2f screenRes;
+        private Vector3f positionToLookAt = null;
+        private boolean cameraLocked = false;
+
+        private float cameraLockedXZFactor = 30.f;
+        private float cameraLockedYFactor = 30.f;
 
 		private float YAW			= -90.f;
         private float PITCH			= 0.f;
@@ -52,36 +57,65 @@ public class Camera
             updateCameraVectors();
         }
 
-        Matrix4f getViewMatrix()
+        public Matrix4f getViewMatrix()
         {
             Vector3f pos = new Vector3f();
             position.add(front, pos);
-            view = new Matrix4f().lookAt(position, pos, up);
+            if(cameraLocked)
+            {
+                position = new Vector3f((float)Math.sin(Time.GetTicks()) * cameraLockedXZFactor,
+                                            cameraLockedYFactor,
+                                        (float)Math.cos(Time.GetTicks()) * cameraLockedXZFactor);
+                position.add(front, pos);
+                view = new Matrix4f().lookAt(position, positionToLookAt, up);
+            }
+            else
+                view = new Matrix4f().lookAt(position, pos, up);
 
             return view;
         }
 
-        Matrix4f getProjectionMatrix()
+        public Matrix4f getProjectionMatrix()
         {
             projection = new Matrix4f().perspective((float)Math.toRadians(zoom), screenRes.x / screenRes.y, 0.1f, 1000.f);
 
             return projection;
         }
 
-        void processKeyboard(CameraMovement dir, float dT, float speed)
+        public void lockCameraAt(Vector3f positionToLookAt, boolean cameraLocked)
+        {
+            this.positionToLookAt = new Vector3f(positionToLookAt);
+            this.cameraLocked = cameraLocked;
+        }
+
+        public void processKeyboard(CameraMovement dir, float dT, float speed)
         {
             float velocity = speed * dT;
             Vector3f pos = new Vector3f();
             switch(dir)
             {
                 case Forward: {
-                    front.mul(velocity, pos);
-                    position.add(pos);
+                    if (cameraLocked)
+                    {
+                        cameraLockedYFactor += velocity;
+                    }
+                    else
+                    {
+                        front.mul(velocity, pos);
+                        position.add(pos);
+                    }
                     break;
                 }
                 case Backward: {
-                    front.mul(velocity, pos);
-                    position.sub(pos);
+                    if(cameraLocked)
+                    {
+                        cameraLockedYFactor -= velocity;
+                    }
+                    else
+                    {
+                        front.mul(velocity, pos);
+                        position.sub(pos);
+                    }
                     break;
                 }
                 case Left: {
@@ -97,23 +131,30 @@ public class Camera
             }
         }
 
-        void processMouseMovement(float offsetX, float offsetY)
+        public void processMouseMovement(float offsetX, float offsetY)
         {
-            offsetX *= mouseSensitivity;
-            offsetY *= mouseSensitivity;
+            if(cameraLocked)
+            {
+                positionToLookAt.y -= (offsetY * mouseSensitivity);
+            }
+            else
+            {
+                offsetX *= mouseSensitivity;
+                offsetY *= mouseSensitivity;
 
-            yaw += offsetX;
-            pitch -= offsetY;
+                yaw += offsetX;
+                pitch -= offsetY;
 
-            if(pitch > 89.f)
-                pitch = 89.f;
-            if(pitch < -89.f)
-                pitch = -89.f;
+                if (pitch > 89.f)
+                    pitch = 89.f;
+                if (pitch < -89.f)
+                    pitch = -89.f;
 
-            updateCameraVectors();
+                updateCameraVectors();
+            }
         }
 
-        void processMouseScroll(float offsetY)
+        public void processMouseScroll(float offsetY)
         {
 
         }

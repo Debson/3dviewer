@@ -1,14 +1,11 @@
 package com.michal.debski.loader;
 
-import com.michal.debski.Shader;
 import com.michal.debski.Vertices;
-import org.lwjgl.system.MemoryUtil;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.BufferOverflowException;
-import java.nio.FloatBuffer;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -17,14 +14,6 @@ import java.util.Vector;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
-import static org.lwjgl.opengl.GL11C.GL_FLOAT;
-import static org.lwjgl.opengl.GL15C.*;
-import static org.lwjgl.opengl.GL15C.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL20C.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20C.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30C.glBindVertexArray;
-import static org.lwjgl.opengl.GL30C.glGenVertexArrays;
-import static org.lwjgl.system.MemoryUtil.memFree;
 
 
 public class Loader
@@ -95,8 +84,10 @@ public class Loader
         List<Float> allVertices = new ArrayList<Float>();
         List<Float> allTexCoords = new ArrayList<Float>();
         List<Float> allNormals = new ArrayList<Float>();
-        directory = path.substring(0, path.lastIndexOf('/'));
-        directory += '/';
+
+        int dirDelimiter = path.lastIndexOf('\\');
+        directory = path.substring(0, dirDelimiter);
+        directory += '\\';
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
@@ -242,17 +233,23 @@ public class Loader
                                         break;
                                     }
                                     case MATERIAL_AMBIENT: {
-                                        mesh.material.ambient = Float.parseFloat(values[1]);
+                                        mesh.material.ambient.x = Float.parseFloat(values[1]);
+                                        mesh.material.ambient.y = Float.parseFloat(values[2]);
+                                        mesh.material.ambient.z = Float.parseFloat(values[3]);
                                         break;
                                     }
 
                                     case MATERIAL_DIFFUSE: {
-                                        mesh.material.diffuse = Float.parseFloat(values[1]);
+                                        mesh.material.diffuse.x = Float.parseFloat(values[1]);
+                                        mesh.material.diffuse.y = Float.parseFloat(values[2]);
+                                        mesh.material.diffuse.z = Float.parseFloat(values[3]);
                                         break;
                                     }
 
                                     case MATERIAL_SPECULAR: {
-                                        mesh.material.specular = Float.parseFloat(values[1]);
+                                        mesh.material.specular.x = Float.parseFloat(values[1]);
+                                        mesh.material.specular.y = Float.parseFloat(values[2]);
+                                        mesh.material.specular.z = Float.parseFloat(values[3]);
                                         break;
                                     }
                                 }
@@ -296,8 +293,7 @@ public class Loader
                 // Process only if any texture coordinates exists
                 if(allTexCoords.isEmpty() == false)
                 {
-                    // Get texture coordinates(only need 2)
-                    // TODO: this must be wrong...
+                    // Get texture coordinates(only need x and y)
                     vertex.texCoord.x = allTexCoords.get(index.y * 2);
                     vertex.texCoord.y = allTexCoords.get(index.y * 2 + 1);
                 }
@@ -313,6 +309,8 @@ public class Loader
 
                 mesh.vertices.add(vertex);
             }
+
+            mesh.material.shininess = 32.f;
 
             mesh.setupMesh();
         }
@@ -332,7 +330,10 @@ public class Loader
                 break;
             }
         }
-        mesh.material = new mdMaterial(0.05f, 0.1f, 0.1f);
+        mesh.material = new mdMaterial(new Vector3f(0.1f),
+                                       new Vector3f(0.1f),
+                                       new Vector3f(0.25f),
+                                       2.f);
         mesh.setupMesh();
         meshes.add(mesh);
     }

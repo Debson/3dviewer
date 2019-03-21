@@ -120,6 +120,8 @@ public class mdMesh
         int normalNr    = 1;
         int heightNr    = 1;
 
+
+        ShaderManager.GetShader().setBool("textureActive", false);
         for(int i = 0; i < textures.size(); i++)
         {
             Loader.mdTexture texture = textures.get(i);
@@ -147,14 +149,16 @@ public class mdMesh
             }*/
 
             ShaderManager.GetShader().setInt("material." + texture.type + "Map", i);
+            ShaderManager.GetShader().setBool("textureActive", true);
 
             // TODO: problem with accessing mdShader methods from Shader class object
             glBindTexture(GL_TEXTURE_2D, textures.get(i).id);
         }
 
-        ShaderManager.GetShader().setFloat("material.ambientStrength", material.ambient);
-        ShaderManager.GetShader().setFloat("material.diffuseStrength", material.diffuse);
-        ShaderManager.GetShader().setFloat("material.specularStrength", material.specular);
+        ShaderManager.GetShader().setVec3("material.ambient", material.ambient);
+        ShaderManager.GetShader().setVec3("material.diffuse", material.diffuse);
+        ShaderManager.GetShader().setVec3("material.specular", material.specular);
+        ShaderManager.GetShader().setFloat("material.shininess", material.shininess);
 
 
         glBindVertexArray(vao);

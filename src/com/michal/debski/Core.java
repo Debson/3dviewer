@@ -21,7 +21,7 @@ public class Core
 
     public void OpenGame(GameHandlerInterface gameHandler)
     {
-        windowProperties = new GameHandlerInterface.WindowProperties(800, 600);
+        windowProperties = new GameHandlerInterface.WindowProperties(1280, 720);
 
         GLFWErrorCallback.createPrint(System.err).set();
 
@@ -32,7 +32,7 @@ public class Core
         if(window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
-        setupGLFW();
+        setupGLFW(gameHandler);
 
         setupOpenGL();
 
@@ -89,7 +89,6 @@ public class Core
 
     public void CloseGame(GameHandlerInterface gameHandler)
     {
-
         gameHandler.OnWindowClose();
         glfwFreeCallbacks(window);
         glfwDestroyWindow(window);
@@ -98,7 +97,7 @@ public class Core
         glfwSetErrorCallback(null).free();
     }
 
-    private void setupGLFW()
+    private void setupGLFW(GameHandlerInterface gameHandler)
     {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
@@ -109,6 +108,18 @@ public class Core
             if(key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                 glfwSetWindowShouldClose(window, true);
             Input.UpdateKeyState(key, action);
+        });
+
+        glfwSetDropCallback(window, (window1, count, names) ->
+        {
+            PointerBuffer nameBuffer = memPointerBuffer(names, count);
+            String pathOfDroppedFile = memUTF8(memByteBufferNT1(nameBuffer.get(0)));
+            gameHandler.OnFileDrop(pathOfDroppedFile);
+        });
+
+        glfwSetMouseButtonCallback(window, (window1, button, action, mods) ->
+        {
+            Input.UpdateKeyState(button, action);
         });
 
         try(MemoryStack stack = stackPush())
@@ -130,7 +141,7 @@ public class Core
         glfwSwapInterval(1);
 
         // Disable cursor, so it won't block at screen bounds
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         glfwShowWindow(window);
 

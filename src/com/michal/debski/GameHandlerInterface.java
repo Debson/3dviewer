@@ -34,4 +34,6 @@ public interface GameHandlerInterface
     public void OnRealtimeUpdate();
 
     public void OnRealTimeRender();
+
+    public void OnFileDrop(String pathOfDroppedFile);
 }

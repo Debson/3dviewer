@@ -6,6 +6,8 @@ import com.michal.debski.utilities.Color;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import java.util.Vector;
+
 public class Model extends Loader
 {
     private Color color = new Color(1.f);
@@ -30,6 +32,11 @@ public class Model extends Loader
     public void setPosition(Vector3f position)
     {
        this.position = position;
+    }
+
+    public Vector3f getPosition()
+    {
+        return position;
     }
 
     public void Render()
