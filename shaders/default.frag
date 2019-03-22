@@ -30,6 +30,8 @@ struct DirLight
 
 uniform Material material;
 uniform DirLight dirLight;
+uniform sampler2D depthMap; // GL_TEXTURE5
+
 uniform vec4 color = vec4(1.0);
 uniform bool lightActive = false;
 uniform bool textureActive = false;

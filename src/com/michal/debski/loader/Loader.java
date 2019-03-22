@@ -85,6 +85,13 @@ public class Loader
         List<Float> allTexCoords = new ArrayList<Float>();
         List<Float> allNormals = new ArrayList<Float>();
 
+        int extPos = path.lastIndexOf('.');
+        if(path.substring(extPos, path.length()).contains("obj") == false)
+        {
+            System.out.println("ERROR: File not supported. Only files with \".obj\" extension are supported.");
+            return;
+        }
+
         int dirDelimiter = path.lastIndexOf('\\');
         directory = path.substring(0, dirDelimiter);
         directory += '\\';
@@ -92,6 +99,14 @@ public class Loader
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
             mdMesh mesh = new mdMesh();
+
+            // Set default mesh material
+
+            mesh.material = new mdMaterial(new Vector3f(0.1f),
+                    new Vector3f(0.1f),
+                    new Vector3f(0.25f),
+                    32.f);
+
             while ((line = br.readLine()) != null)
             {
                 // Split line into words
@@ -305,6 +320,10 @@ public class Loader
                     vertex.normal.x = allNormals.get(index.z * 3);
                     vertex.normal.y = allNormals.get(index.z * 3 + 1);
                     vertex.normal.z = allNormals.get(index.z * 3 + 2);
+                }
+                else
+                {
+                    // TODO: Generate normals
                 }
 
                 mesh.vertices.add(vertex);
