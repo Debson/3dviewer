@@ -4,7 +4,7 @@ public interface GameHandlerInterface
 {
     class WindowProperties
     {
-        static int width, height;
+        public static int width, height;
 
         WindowProperties(int width, int height)
         {

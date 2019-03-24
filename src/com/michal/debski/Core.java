@@ -49,7 +49,8 @@ public class Core
     {
         GL.createCapabilities();
 
-        glClearColor(1.f, 0.6f, 0.f, 1.f);
+        //glClearColor(1.f, 0.6f, 0.f, 1.f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.f);
 
         DoubleBuffer mousePosX = BufferUtils.createDoubleBuffer(1);
         DoubleBuffer mousePosY = BufferUtils.createDoubleBuffer(1);

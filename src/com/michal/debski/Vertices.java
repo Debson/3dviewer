@@ -47,14 +47,16 @@ public class Vertices
         -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left
 };
 
+    private final static float size = 255.f;
+
     public static float[] planeVertices = {
         // positions            // normals         // texcoords
-        25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
-        -25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-        -25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+            size, -0.5f,  size,  0.0f, 1.0f, 0.0f,  size,  0.0f,
+        -size, -0.5f,  size,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
+        -size, -0.5f, -size,  0.0f, 1.0f, 0.0f,   0.0f, size,
 
-        25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
-        -25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
-        25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,  25.0f, 25.0f
+        size, -0.5f,  size,  0.0f, 1.0f, 0.0f,  size,  0.0f,
+        -size, -0.5f, -size,  0.0f, 1.0f, 0.0f,   0.0f, size,
+            size, -0.5f, -size,  0.0f, 1.0f, 0.0f,  size, size
 };
 }

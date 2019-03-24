@@ -120,6 +120,7 @@ public class mdMesh
         int normalNr    = 1;
         int heightNr    = 1;
 
+        ShaderManager.GetShader().use();
 
         ShaderManager.GetShader().setBool("textureActive", false);
         for(int i = 0; i < textures.size(); i++)
@@ -148,7 +149,7 @@ public class mdMesh
                 num = heightNr++;
             }*/
 
-            ShaderManager.GetShader().setInt("material." + texture.type + "Map", i);
+            //ShaderManager.GetShader().setInt("material." + texture.type + "Map", i);
             ShaderManager.GetShader().setBool("textureActive", true);
 
             // TODO: problem with accessing mdShader methods from Shader class object

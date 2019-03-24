@@ -13,6 +13,7 @@ public class Model extends Loader
     private Color color = new Color(1.f);
     private Matrix4f matrixModel;
     private Vector3f position = new Vector3f(0.f);
+    private Vector3f scale = new Vector3f(1.f);
 
     public Model(String path)
     {
@@ -29,6 +30,11 @@ public class Model extends Loader
         this.color = color;
     }
 
+    public void setScale(Vector3f scale)
+    {
+        this.scale = scale;
+    }
+
     public void setPosition(Vector3f position)
     {
        this.position = position;
@@ -43,8 +49,8 @@ public class Model extends Loader
     {
         for(mdMesh mesh : super.meshes)
         {
-            matrixModel = new Matrix4f();
-            matrixModel.translate(position);
+            ShaderManager.GetShader().use();
+            matrixModel = new Matrix4f().translate(position).scale(scale);
             ShaderManager.GetShader().setVec4("color", color.r, color.g, color.b, color.a);
             ShaderManager.GetShader().setMat4("model", matrixModel);
             mesh.Render();

@@ -77,9 +77,9 @@ public class Camera
 
         public Matrix4f getProjectionMatrix()
         {
-            projection = new Matrix4f().perspective((float)Math.toRadians(zoom), screenRes.x / screenRes.y, 0.1f, 1000.f);
+            //projection = new Matrix4f().perspective((float)Math.toRadians(zoom), screenRes.x / screenRes.y, 0.1f, 1000.f);
 
-            return projection;
+            return new Matrix4f().perspective((float)Math.toRadians(zoom), screenRes.x / screenRes.y, 0.1f, 1000.f);
         }
 
         public void lockCameraAt(Vector3f positionToLookAt, boolean cameraLocked)
