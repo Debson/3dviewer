@@ -6,6 +6,7 @@ import com.michal.debski.Shader;
 import com.michal.debski.ShaderManager;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.opengl.GL;
 
 import java.nio.ByteBuffer;
 
@@ -13,16 +14,19 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class Shadows
 {
-    private final int shadowWidth = 1024;
-    private final int shadowHeight = 1024;
+    // High quality shadows
+    private final int shadowWidth = 8192;
+    private final int shadowHeight = 8192;
+
     private final String shadowShaderVertPath = "shaders\\shadowShader.vert";
     private final String shadowShaderFragPath = "shaders\\shadowShader.frag";
     public final int shaderTextureNum = GL_TEXTURE6;
 
 
     private Matrix4f lightSpaceMatrix;
-    private float nearPlane = 1.f;
-    private float farPlane = 7.5f;
+    public final float nearPlane = 1.f;
+    public final float farPlane = 100.0f;
+    public final float lightProjectionSize = 100.f;
     private Vector3f lightPos;
 
     private int depthMapFBO, depthMap;
@@ -37,13 +41,13 @@ public class Shadows
         shader = new Shader(shadowShaderVertPath, shadowShaderFragPath);
 
         // Configure depth map framebuffer and create depth texture
-        depthMapFBO =  glGenFramebuffers();
+        depthMapFBO = glGenFramebuffers();
 
         depthMap = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, depthMap);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadowWidth, shadowHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, (ByteBuffer)null);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
@@ -60,27 +64,27 @@ public class Shadows
             throw new AssertionError("Could not create Framebuffer: " + fboStatus);
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     public void fillDepthMap(SceneInterface scene)
     {
+        // Set global shader to simple shader used to render to depth map
         ShaderManager.SetShader(shader);
 
-        //Matrix4f lightProjection = new Matrix4f().perspective(45.f, shadowWidth / shadowHeight, nearPlane, farPlane);
-        Matrix4f lightProjection = new Matrix4f().ortho(-10.f, 10.f, -10.f, 10.f, nearPlane, farPlane);
+        Matrix4f lightProjection = new Matrix4f().ortho(-lightProjectionSize, lightProjectionSize, -lightProjectionSize, lightProjectionSize, nearPlane, farPlane);
         Matrix4f lightView = new Matrix4f().lookAt(lightPos, new Vector3f(0.f), new Vector3f(0.f, 1.f, 0.f));
         lightSpaceMatrix = new Matrix4f();
         lightProjection.mul(lightView, lightSpaceMatrix);
-        //lightView.mul(lightProjection, lightSpaceMatrix);
 
         shader.use();
         shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-        scene.updateMatrices(shader);
 
+        // Render scene to depth buffer
         glViewport(0, 0, shadowWidth, shadowHeight);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
             glClear(GL_DEPTH_BUFFER_BIT);
-            scene.renderScene();
+            scene.renderScene(shader);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glViewport(0, 0, Core.windowProperties.width, Core.windowProperties.height);

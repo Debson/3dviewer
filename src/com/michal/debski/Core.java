@@ -1,6 +1,6 @@
 package com.michal.debski;
 
-import com.michal.debski.environment.DirectionalLight;
+
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -18,6 +18,9 @@ public class Core
 {
     private long window;
     public static GameHandlerInterface.WindowProperties windowProperties;
+    GLFWFramebufferSizeCallback fbCallback;
+
+
 
     public void OpenGame(GameHandlerInterface gameHandler)
     {
@@ -32,9 +35,12 @@ public class Core
         if(window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
+
         setupGLFW(gameHandler);
 
         setupOpenGL();
+
+        //setupImGui();
 
         // Display information about the system
         System.out.println("Vendor:         " + GL11.glGetString(GL11.GL_VENDOR));
@@ -104,12 +110,22 @@ public class Core
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
+        glfwSetFramebufferSizeCallback(window, fbCallback = new GLFWFramebufferSizeCallback() {
+            public void invoke(long window, int width, int height) {
+                if (width > 0 && height > 0 && (windowProperties.width!= width || windowProperties.height != height)) {
+                    windowProperties.width = width;
+                    windowProperties.height = height;
+                }
+            }
+        });
+
         glfwSetKeyCallback(window, (window, key, scancode, action, mods) ->
         {
             if(key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                 glfwSetWindowShouldClose(window, true);
             Input.UpdateKeyState(key, action);
         });
+
 
         glfwSetDropCallback(window, (window1, count, names) ->
         {
@@ -151,6 +167,13 @@ public class Core
 
     private void setupOpenGL()
     {
+        //glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
+    }
+
+    private void setupImGui()
+    {
+
+
     }
 }

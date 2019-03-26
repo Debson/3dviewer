@@ -51,12 +51,21 @@ public class Vertices
 
     public static float[] planeVertices = {
         // positions            // normals         // texcoords
-            size, -0.5f,  size,  0.0f, 1.0f, 0.0f,  size,  0.0f,
-        -size, -0.5f,  size,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-        -size, -0.5f, -size,  0.0f, 1.0f, 0.0f,   0.0f, size,
+         size, -0.5f,  size,  0.0f, 1.0f, 0.0f,  size,  0.0f,
+        -size, -0.5f,  size,  0.0f, 1.0f, 0.0f,  0.0f,  0.0f,
+        -size, -0.5f, -size,  0.0f, 1.0f, 0.0f,  0.0f,  size,
 
-        size, -0.5f,  size,  0.0f, 1.0f, 0.0f,  size,  0.0f,
-        -size, -0.5f, -size,  0.0f, 1.0f, 0.0f,   0.0f, size,
-            size, -0.5f, -size,  0.0f, 1.0f, 0.0f,  size, size
+         size, -0.5f,  size,  0.0f, 1.0f, 0.0f,  size,  0.0f,
+        -size, -0.5f, -size,  0.0f, 1.0f, 0.0f,  0.0f,  size,
+         size, -0.5f, -size,  0.0f, 1.0f, 0.0f,  size,  size
 };
+
+    public static float quadVertices[] = {
+            -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+            1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
+            1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+            1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+            -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
+            -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+    };
 }

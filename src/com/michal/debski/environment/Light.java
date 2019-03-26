@@ -3,37 +3,43 @@ package com.michal.debski.environment;
 import com.michal.debski.*;
 import com.michal.debski.loader.Loader;
 import com.michal.debski.utilities.Color;
+import com.michal.debski.utilities.Transform;
 import org.joml.Vector3f;
 
 import static org.lwjgl.opengl.GL30.*;
 
-public class Light
+public class Light extends Model
 {
     // This should be the parent class. Child classes: directional light, point light
     // Light method render should be called before any drawing, so it will set boolean variable
     // that manages lighting in shader to true, so the scene will be drawn with lighting.
-    protected Vector3f position;
     protected float strength;
     protected Color color;
     protected boolean lightActive = true;
     private boolean orbiting = false;
+    private Vector3f orbitingPosition = null;
+    private float orbitingRadius = 10.f;
+    private float orbitingSpeed = 2.f;
+
     private boolean renderLightCube = true;
     private boolean castShadows = true;
-    private Model cube = new Model(Loader.PrimitiveType.Cube);
     private Shadows shadows = null;
+
 
     public Light(Vector3f position)
     {
-        this.position = position;
+        super(Loader.PrimitiveType.Cube);
+        this.getTransform().setPosition(position);
         this.color = new Color(1.f);
-        shadows = new Shadows(this.position);
+        shadows = new Shadows(this.getTransform().getPosition());
     }
 
     public Light(Vector3f position, Color color)
     {
-        this.position = position;
+        super(Loader.PrimitiveType.Cube);
+        this.getTransform().setPosition(position);
         this.color = color;
-        shadows = new Shadows(this.position);
+        shadows = new Shadows(this.getTransform().getPosition());
     }
 
     public void on()
@@ -46,19 +52,27 @@ public class Light
         this.lightActive = false;
     }
 
-    public void setPosition(Vector3f position)
-    {
-        this.position = position;
-    }
-
     public void setOribitng(boolean orbiting)
     {
         this.orbiting = orbiting;
     }
 
-    public Vector3f getPosition()
+    public void setOrbitingSpeed(float orbitingSpeed)
     {
-        return position;
+        this.orbitingSpeed = orbitingSpeed;
+    }
+
+    public void setOrbitingRadius(float orbitingRadius)
+    {
+        this.orbitingRadius = orbitingRadius;
+    }
+
+    public void setOrbitingAroundPosition(Vector3f orbitingPosition, float orbitingRadius, float orbitingSpeed, boolean orbiting)
+    {
+        this.orbiting = orbiting;
+        this.orbitingRadius = orbitingRadius;
+        this.orbitingSpeed = orbitingSpeed;
+        this.orbitingPosition = orbitingPosition;
     }
 
     public void renderLightCube(boolean val)
@@ -72,7 +86,8 @@ public class Light
         renderLight();
         if(lightActive)
         {
-            ShaderManager.GetShader().setVec3("light.direction", position);
+
+            ShaderManager.GetShader().setVec3("light.direction", getTransform().getPosition());
             //ShaderManager.GetShader().setVec3("lightPos", position);
             ShaderManager.GetShader().setVec3("light.color", color.r, color.g, color.b);
         }
@@ -83,14 +98,20 @@ public class Light
         if(renderLightCube)
         {
             ShaderManager.GetShader().setBool("lightActive", false);
-            if(orbiting)
+            if(orbiting && orbitingPosition != null)
             {
-                position.x = (float)Math.sin(Time.GetTicks() * 1.f) * 70.f;
-                position.z = (float)Math.cos(Time.GetTicks() * 1.f) * 70.f;
+                getTransform().getPosition().x = orbitingPosition.x + (float)Math.sin(Time.GetTicks() * orbitingSpeed) * orbitingRadius;
+                getTransform().getPosition().z = orbitingPosition.z + (float)Math.cos(Time.GetTicks() * orbitingSpeed) * orbitingRadius;
             }
-            cube.setColor(color);
-            cube.setPosition(position);
-            cube.Render();
+            else if(orbiting)
+            {
+                getTransform().getPosition().x += (float)Math.sin(Time.GetTicks() * orbitingSpeed) * orbitingRadius;
+                getTransform().getPosition().z += (float)Math.cos(Time.GetTicks() * orbitingSpeed) * orbitingRadius;
+            }
+
+            setColor(color);
+            getTransform().setPosition(getTransform().getPosition());
+            Render();
         }
 
         ShaderManager.GetShader().setBool("lightActive", lightActive);
@@ -102,13 +123,13 @@ public class Light
         shadows.fillDepthMap(scene);
 
         ShaderManager.SetShader(tempShader);
+
         // Render scene as normal
         ShaderManager.GetShader().use();
         ShaderManager.GetShader().setInt("shadows.depthMap", 6);
         ShaderManager.GetShader().setMat4("lightSpaceMatrix", shadows.getLightSpaceMatrix());
-        ShaderManager.GetShader().setBool("shadows.switchedOn", true);
+        //ShaderManager.GetShader().setBool("shadows.switchedOn", true);
         glActiveTexture(shadows.shaderTextureNum);
         glBindTexture(GL_TEXTURE_2D, shadows.getDepthMap());
-        scene.renderScene();
     }
 }

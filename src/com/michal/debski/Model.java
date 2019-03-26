@@ -3,6 +3,7 @@ package com.michal.debski;
 import com.michal.debski.loader.Loader;
 import com.michal.debski.loader.mdMesh;
 import com.michal.debski.utilities.Color;
+import com.michal.debski.utilities.Transform;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -12,8 +13,8 @@ public class Model extends Loader
 {
     private Color color = new Color(1.f);
     private Matrix4f matrixModel;
-    private Vector3f position = new Vector3f(0.f);
-    private Vector3f scale = new Vector3f(1.f);
+
+    private Transform transform = new Transform();
 
     public Model(String path)
     {
@@ -30,29 +31,19 @@ public class Model extends Loader
         this.color = color;
     }
 
-    public void setScale(Vector3f scale)
+    public Transform getTransform()
     {
-        this.scale = scale;
-    }
-
-    public void setPosition(Vector3f position)
-    {
-       this.position = position;
-    }
-
-    public Vector3f getPosition()
-    {
-        return position;
+        return transform;
     }
 
     public void Render()
     {
+        ShaderManager.GetShader().use();
+        matrixModel = new Matrix4f().translate(transform.getPosition()).scale(transform.getScale());
+        ShaderManager.GetShader().setVec4("color", color.r, color.g, color.b, color.a);
+        ShaderManager.GetShader().setMat4("model", matrixModel);
         for(mdMesh mesh : super.meshes)
         {
-            ShaderManager.GetShader().use();
-            matrixModel = new Matrix4f().translate(position).scale(scale);
-            ShaderManager.GetShader().setVec4("color", color.r, color.g, color.b, color.a);
-            ShaderManager.GetShader().setMat4("model", matrixModel);
             mesh.Render();
         }
     }

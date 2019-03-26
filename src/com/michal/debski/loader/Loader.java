@@ -53,7 +53,8 @@ public class Loader
     public enum PrimitiveType
     {
         Cube,
-        Plane
+        Plane,
+        Quad
     };
 
 
@@ -346,6 +347,10 @@ public class Loader
             }
             case Plane: {
                 mesh.vertices = arrayToMDVertex(Vertices.planeVertices, 8);
+                break;
+            }
+            case Quad: {
+                mesh.vertices = arrayToMDVertex(Vertices.quadVertices, 8);
                 break;
             }
         }

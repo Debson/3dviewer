@@ -92,7 +92,7 @@ vec4 calculateDirectionalLight()
 
     float shadow = CalculateShadows(FragPosLightSpace);
 
-    return vec4((ambient + (1.0 - shadow * 1000.0) * (diffuse + specular)) * vec3(color), 1.0);
+    return vec4((ambient + (1.0 - shadow) * (diffuse + specular)) * vec3(dirLight.color), 1.0);
 }
 
 
@@ -104,7 +104,7 @@ float CalculateShadows(vec4 fragPosLigtSpace)
     float currentDepth = projCoords.z;
 
     vec3 normal = normalize(Normal);
-    vec3 lightDir = normalize(dirLight.direction - FragPos);
+    vec3 lightDir = normalize(dirLight.direction);
     float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
 
     float shadow = 0.0;

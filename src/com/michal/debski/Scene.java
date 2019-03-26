@@ -1,36 +1,31 @@
 package com.michal.debski;
 
 import com.michal.debski.environment.DirectionalLight;
-import com.michal.debski.environment.Shadows;
 import com.michal.debski.loader.Loader;
 import com.michal.debski.utilities.Color;
-import org.joml.Matrix4f;
+
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.system.MemoryUtil;
 
-import java.nio.FloatBuffer;
-
-
-import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
-import static org.lwjgl.opengl.GL30C.*;
-import static org.lwjgl.system.MemoryUtil.memFree;
 
 public class Scene implements GameHandlerInterface, SceneInterface
 {
     private Shader shader;
     private Camera camera;
     private DirectionalLight dirLight;
-    private Matrix4f model;
     private float cameraMoveSpeed = 10.f;
-    private Model myModel, floor;
+    private Model myModel, floor, cube;
+
+
 
     @Override
     public void OnWindowOpen()
     {
         System.out.println("Opened!");
 
-        shader = new Shader("shaders//default.vert", "shaders//default.frag");
+        shader = new Shader("shaders\\default.vert", "shaders\\default.frag");
+
+
         camera = new Camera(new Vector2f(
                 WindowProperties.getWidth(),
                 WindowProperties.getHeight()),
@@ -44,16 +39,23 @@ public class Scene implements GameHandlerInterface, SceneInterface
         String path4 = "assets\\teddybear.obj";
 
         myModel = new Model(path2);
-        myModel.setPosition(new Vector3f(0.f, 5.f, 0.f));
-        myModel.setScale(new Vector3f(1.f));
+        myModel.getTransform().setPosition(new Vector3f(0.f, 0.f, 0.f));
+        myModel.getTransform().setScale(new Vector3f(1.f));
         //myModel.setColor(new Color(1.f, 0.5f, 1.f));
         floor = new Model(Loader.PrimitiveType.Plane);
-        floor.setColor(new Color(1.f, 0.f, 0.f, 1.f));
+        floor.setColor(new Color(1.f, 0.f, 1.f, 1.f));
+
+        cube = new Model(Loader.PrimitiveType.Cube);
+        //cube.setScale(new Vector3f(50.f, 1.f, 50.f));
+        cube.getTransform().setPosition(new Vector3f(0.f, 1.f, 10.f));
 
         //camera.lockCameraAt(myModel.getPosition(), true);
 
-        dirLight = new DirectionalLight(new Vector3f(20.f, 20.f, 15.f), new Color( 3.5f));
-        dirLight.setOribitng(true);
+        dirLight = new DirectionalLight(new Vector3f( -20.f, 30.f, -30.f), new Color( 3.5f));
+        //dirLight.setOribitng(true);
+        dirLight.setOrbitingAroundPosition(myModel.getTransform().getPosition(), 50.f, 0.5f,true);
+
+
     }
 
     @Override
@@ -86,12 +88,17 @@ public class Scene implements GameHandlerInterface, SceneInterface
     @Override
     public void OnRealTimeRender()
     {
-        model = new Matrix4f();
-
+        // Set global shader to default shader
         ShaderManager.SetShader(shader);
         updateMatrices(shader);
 
+        // Render scene to depth map
         dirLight.renderSceneWithShadows(this);
+        // Render light box and set light uniforms
+        dirLight.Render(camera.position);
+        // Render scene as normal
+        renderScene(shader);
+
     }
 
     @Override
@@ -107,7 +114,6 @@ public class Scene implements GameHandlerInterface, SceneInterface
         shader.use();
         shader.setMat4("projection", camera.getProjectionMatrix());
         shader.setMat4("view", camera.getViewMatrix());
-        shader.setMat4("model", model);
     }
 
     private void processCameraInput()
@@ -133,12 +139,11 @@ public class Scene implements GameHandlerInterface, SceneInterface
     }
 
     @Override
-    public void renderScene()
+    public void renderScene(Shader shader)
     {
-        dirLight.Render(camera.position);
         floor.Render();
         myModel.Render();
-
+        cube.Render();
     }
 
     public static void main(String[] args)

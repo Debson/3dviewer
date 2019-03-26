@@ -28,7 +28,6 @@ import static org.lwjgl.system.MemoryUtil.memFree;
 
 public class mdMesh
 {
-
     public String name = "";
     public List<Loader.mdVertex> vertices = new ArrayList<Loader.mdVertex>();
     public List<Vector3i> indices      = new ArrayList<Vector3i>();
@@ -149,7 +148,7 @@ public class mdMesh
                 num = heightNr++;
             }*/
 
-            //ShaderManager.GetShader().setInt("material." + texture.type + "Map", i);
+            ShaderManager.GetShader().setInt("material." + texture.type + "Map", i);
             ShaderManager.GetShader().setBool("textureActive", true);
 
             // TODO: problem with accessing mdShader methods from Shader class object
@@ -163,7 +162,6 @@ public class mdMesh
 
 
         glBindVertexArray(vao);
-        //glDrawElements(GL_TRIANGLES,  indices.size(), GL_UNSIGNED_INT, 0);
         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
         // Unbind VERTEX ARRAY BUFFER & TEXTURE

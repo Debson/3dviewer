@@ -25,7 +25,7 @@ public class DirectionalLight extends Light
         if(lightActive)
         {
             ShaderManager.GetShader().setVec3("viewPos", cameraPosition);
-            ShaderManager.GetShader().setVec3("dirLight.direction", position);
+            ShaderManager.GetShader().setVec3("dirLight.direction", getTransform().getPosition());
             //ShaderManager.GetShader().setVec3("lightPos", position);
             ShaderManager.GetShader().setVec3("dirLight.color", color.r, color.g, color.b);
         }

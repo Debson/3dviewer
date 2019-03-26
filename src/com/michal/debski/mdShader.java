@@ -102,6 +102,15 @@ public class mdShader
         }
     }
 
+    public void setMat4(String name, Matrix4f mat, boolean transpose)
+    {
+        try(MemoryStack stack = MemoryStack.stackPush()) {
+            FloatBuffer fb = stack.mallocFloat(16);
+            mat.get(fb);
+            glUniformMatrix4fv(glGetUniformLocation(programID, name), transpose, fb);
+        }
+    }
+
     private String loadFile(String path)
     {
         String str = "";
