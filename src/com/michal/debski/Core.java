@@ -1,6 +1,8 @@
 package com.michal.debski;
 
 
+import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -31,6 +33,8 @@ public class Core
         if(!glfwInit())
             throw new IllegalStateException("Cannot initialize GLFW");
 
+        glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
         window = glfwCreateWindow(windowProperties.getWidth(), windowProperties.getHeight(), "model_loader", NULL, NULL);
         if(window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
@@ -40,7 +44,6 @@ public class Core
 
         setupOpenGL();
 
-        //setupImGui();
 
         // Display information about the system
         System.out.println("Vendor:         " + GL11.glGetString(GL11.GL_VENDOR));
@@ -108,7 +111,6 @@ public class Core
     {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         glfwSetFramebufferSizeCallback(window, fbCallback = new GLFWFramebufferSizeCallback() {
             public void invoke(long window, int width, int height) {
@@ -137,6 +139,18 @@ public class Core
         glfwSetMouseButtonCallback(window, (window1, button, action, mods) ->
         {
             Input.UpdateKeyState(button, action);
+        });
+
+        glfwSetWindowPosCallback(window, (window1, posX, posY) ->
+        {
+            windowProperties.posX = posX;
+            windowProperties.posY = posY;
+            gameHandler.OnWindowMove(posX, posY);
+        });
+
+        glfwSetWindowFocusCallback(window, (window1, focused) ->
+        {
+            gameHandler.OnWindowFocus(focused);
         });
 
         try(MemoryStack stack = stackPush())

@@ -7,6 +7,8 @@ import com.michal.debski.utilities.Color;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import javax.swing.*;
+
 
 public class Scene implements GameHandlerInterface, SceneInterface
 {
@@ -15,6 +17,8 @@ public class Scene implements GameHandlerInterface, SceneInterface
     private DirectionalLight dirLight;
     private float cameraMoveSpeed = 10.f;
     private Model myModel, floor, cube;
+
+    private Gui gui;
 
 
 
@@ -56,12 +60,19 @@ public class Scene implements GameHandlerInterface, SceneInterface
         dirLight.setOrbitingAroundPosition(myModel.getTransform().getPosition(), 50.f, 0.5f,true);
 
 
+        gui = new Gui();
+        for(Panel panel : Containers.panelContainer)
+        {
+            PanelEntity panelEntity =  panel.createPanelEntity(gui.getMainPanel());
+            gui.addToMainPanel(panelEntity.getPanel(), panelEntity.getPanelName());
+        }
+
     }
 
     @Override
     public void OnWindowClose()
     {
-
+        gui.dispose();
     }
 
     @Override
@@ -106,6 +117,20 @@ public class Scene implements GameHandlerInterface, SceneInterface
     {
         myModel = null;
         myModel = new Model(pathOfDroppedFile);
+    }
+
+    @Override
+    public void OnWindowMove(int winX, int winY)
+    {
+        if(gui != null)
+            gui.setPosition();
+    }
+
+    @Override
+    public void OnWindowFocus(boolean hasFocus)
+    {
+        // Small hack, so the gui window will always be visible only when game window is visible
+        gui.setAlwaysOnTop(hasFocus);
     }
 
     @Override

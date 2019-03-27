@@ -1,14 +1,18 @@
 package com.michal.debski.environment;
 
 import com.michal.debski.*;
+import com.michal.debski.Panel;
 import com.michal.debski.loader.Loader;
 import com.michal.debski.utilities.Color;
-import com.michal.debski.utilities.Transform;
+
 import org.joml.Vector3f;
+
+import javax.swing.*;
+import java.awt.*;
 
 import static org.lwjgl.opengl.GL30.*;
 
-public class Light extends Model
+public class Light extends Model implements Panel
 {
     // This should be the parent class. Child classes: directional light, point light
     // Light method render should be called before any drawing, so it will set boolean variable
@@ -26,12 +30,16 @@ public class Light extends Model
     private Shadows shadows = null;
 
 
+
+
     public Light(Vector3f position)
     {
         super(Loader.PrimitiveType.Cube);
         this.getTransform().setPosition(position);
         this.color = new Color(1.f);
         shadows = new Shadows(this.getTransform().getPosition());
+        Containers.AddPanelContainer(this);
+
     }
 
     public Light(Vector3f position, Color color)
@@ -40,6 +48,7 @@ public class Light extends Model
         this.getTransform().setPosition(position);
         this.color = color;
         shadows = new Shadows(this.getTransform().getPosition());
+        Containers.AddPanelContainer(this);
     }
 
     public void on()
@@ -131,5 +140,21 @@ public class Light extends Model
         //ShaderManager.GetShader().setBool("shadows.switchedOn", true);
         glActiveTexture(shadows.shaderTextureNum);
         glBindTexture(GL_TEXTURE_2D, shadows.getDepthMap());
+    }
+
+    @Override
+    public PanelEntity createPanelEntity(JPanel mainPanel)
+    {
+        JPanel panel = new JPanel();
+        String panelName = "Light";
+
+        //panel.setLayout(new GridLayout());
+        JButton button = new JButton("CLICK me");
+        //button.setPreferredSize(new Dimension(100, 100));
+        panel.add(button);
+        panel.setBackground(java.awt.Color.RED);
+        panel.setPreferredSize(new Dimension(100, 100));
+
+        return new PanelEntity(panel, panelName);
     }
 }

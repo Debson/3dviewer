@@ -5,6 +5,7 @@ public interface GameHandlerInterface
     class WindowProperties
     {
         public static int width, height;
+        public static int posX, posY;
 
         WindowProperties(int width, int height)
         {
@@ -21,7 +22,17 @@ public interface GameHandlerInterface
         {
             return height;
         }
-    };
+
+        public static int getPosX()
+        {
+            return posX;
+        }
+        public static int getPosY()
+        {
+            return posY;
+        }
+
+    }
 
     public void OnWindowOpen();
 
@@ -36,4 +47,8 @@ public interface GameHandlerInterface
     public void OnRealTimeRender();
 
     public void OnFileDrop(String pathOfDroppedFile);
+
+    public void OnWindowMove(int winX, int winY);
+
+    public void OnWindowFocus(boolean hasFocus);
 }
