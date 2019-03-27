@@ -5,10 +5,14 @@ import com.michal.debski.Panel;
 import com.michal.debski.loader.Loader;
 import com.michal.debski.utilities.Color;
 
+import com.michal.debski.utilities.mdTimer;
 import org.joml.Vector3f;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ItemEvent;
 
 import static org.lwjgl.opengl.GL30.*;
 
@@ -28,8 +32,7 @@ public class Light extends Model implements Panel
     private boolean renderLightCube = true;
     private boolean castShadows = true;
     private Shadows shadows = null;
-
-
+    private mdTimer orbitingTimer = new mdTimer();
 
 
     public Light(Vector3f position)
@@ -64,6 +67,10 @@ public class Light extends Model implements Panel
     public void setOribitng(boolean orbiting)
     {
         this.orbiting = orbiting;
+        if(orbiting)
+            orbitingTimer.start();
+        else
+            orbitingTimer.stop();
     }
 
     public void setOrbitingSpeed(float orbitingSpeed)
@@ -78,7 +85,7 @@ public class Light extends Model implements Panel
 
     public void setOrbitingAroundPosition(Vector3f orbitingPosition, float orbitingRadius, float orbitingSpeed, boolean orbiting)
     {
-        this.orbiting = orbiting;
+        setOribitng(orbiting);
         this.orbitingRadius = orbitingRadius;
         this.orbitingSpeed = orbitingSpeed;
         this.orbitingPosition = orbitingPosition;
@@ -109,13 +116,13 @@ public class Light extends Model implements Panel
             ShaderManager.GetShader().setBool("lightActive", false);
             if(orbiting && orbitingPosition != null)
             {
-                getTransform().getPosition().x = orbitingPosition.x + (float)Math.sin(Time.GetTicks() * orbitingSpeed) * orbitingRadius;
-                getTransform().getPosition().z = orbitingPosition.z + (float)Math.cos(Time.GetTicks() * orbitingSpeed) * orbitingRadius;
+                getTransform().getPosition().x = orbitingPosition.x + (float)Math.sin(orbitingTimer.getCurrentTime() * orbitingSpeed) * orbitingRadius;
+                getTransform().getPosition().z = orbitingPosition.z + (float)Math.cos(orbitingTimer.getCurrentTime() * orbitingSpeed) * orbitingRadius;
             }
             else if(orbiting)
             {
-                getTransform().getPosition().x += (float)Math.sin(Time.GetTicks() * orbitingSpeed) * orbitingRadius;
-                getTransform().getPosition().z += (float)Math.cos(Time.GetTicks() * orbitingSpeed) * orbitingRadius;
+                getTransform().getPosition().x += (float)Math.sin(orbitingTimer.getCurrentTime() * orbitingSpeed) * orbitingRadius;
+                getTransform().getPosition().z += (float)Math.cos(orbitingTimer.getCurrentTime() * orbitingSpeed) * orbitingRadius;
             }
 
             setColor(color);
@@ -143,16 +150,52 @@ public class Light extends Model implements Panel
     }
 
     @Override
-    public PanelEntity createPanelEntity(JPanel mainPanel)
+    public PanelEntity createPanelEntity(JPanel mainPanel, CardLayout mainPanelCardLayout)
     {
         JPanel panel = new JPanel();
         String panelName = "Light";
+        panel.setLayout(new BorderLayout());
 
+        JPanel settingsPanel = new JPanel();
+        settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
+        JCheckBox orbiting = new JCheckBox("Is orbiting: ");
+        orbiting.setSelected(this.orbiting);
+        orbiting.addItemListener(e -> {
+            if(e.getStateChange() == ItemEvent.SELECTED)
+                setOribitng(true);
+            else
+                setOribitng(false);
+        });
+        settingsPanel.add(orbiting);
+
+        JSlider posXSlider = new JSlider(JSlider.HORIZONTAL, -50, 50, (int)getTransform().getPosition().x);
+        posXSlider.addChangeListener(e -> {
+            getTransform().getPosition().x = posXSlider.getValue();
+        });
+        posXSlider.setMajorTickSpacing(10);
+        posXSlider.setPaintTicks(true);
+        posXSlider.setPaintLabels(true);
+        settingsPanel.add(posXSlider);
+
+        panel.add(settingsPanel);
+
+
+        // Bottom GO BACK button
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         //panel.setLayout(new GridLayout());
-        JButton button = new JButton("CLICK me");
+        JButton goBackButton = new JButton("Go back");
+        goBackButton.addActionListener(e -> {
+            mainPanelCardLayout.show(mainPanel, "Settings");
+        });
+        buttonPanel.add(goBackButton);
+        buttonPanel.setOpaque(false);
         //button.setPreferredSize(new Dimension(100, 100));
-        panel.add(button);
-        panel.setBackground(java.awt.Color.RED);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+
+
+
+        //panel.setBackground(java.awt.Color.RED);
         panel.setPreferredSize(new Dimension(100, 100));
 
         return new PanelEntity(panel, panelName);

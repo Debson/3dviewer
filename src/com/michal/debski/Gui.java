@@ -5,7 +5,7 @@ import org.w3c.dom.css.Rect;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.Panel;
+import java.util.ArrayList;
 import java.util.concurrent.Flow;
 
 public class Gui extends JFrame
@@ -45,7 +45,7 @@ public class Gui extends JFrame
 
         GridBagConstraints g = new GridBagConstraints();
         settingsPanel.setLayout(new GridBagLayout());
-        g.insets = new Insets(1000, 0, 0, 0);
+        /*g.insets = new Insets(1000, 0, 0, 0);
         for(int i = 0; i < 5; i++) {
             JButton button = new JButton(String.valueOf(i));
 
@@ -65,7 +65,7 @@ public class Gui extends JFrame
         g.weightx = 1.f;
         JPanel filler = new JPanel();
         filler.setOpaque(false);
-        settingsPanel.add(filler, g);
+        settingsPanel.add(filler, g);*/
 
         settingsPanel.setAutoscrolls(true);
         settingsScrollPanel = new JScrollPane(settingsPanel);
@@ -119,11 +119,29 @@ public class Gui extends JFrame
                 Core.windowProperties.getPosY() - windowsTitleBarSize);
     }
 
-    public void finalize()
+    public void createGui(ArrayList<Panel> panelEntityList)
     {
-        add(mainPanel);
-        //pack();
+        GridBagConstraints gbc = new GridBagConstraints();
+        for(Panel panel : panelEntityList)
+        {
+            PanelEntity panelEntity =  panel.createPanelEntity(mainPanel, cardLayout);
+            mainPanel.add(panelEntity.getPanel(), panelEntity.getPanelName());
+
+            JButton settingButton = new JButton(panelEntity.getPanelName());
+            settingButton.addActionListener(e -> {
+                cardLayout.show(mainPanel, panelEntity.getPanelName());
+            });
+
+            gbc.gridy++;
+            gbc.insets = new Insets((settingsButtonsCounter != 0) ? 5 : 0, -width / 2, 0 ,0);
+            settingsPanel.add(settingButton, gbc);
+        }
+        gbc.gridy++;
+        gbc.weighty = 1.f;
+        gbc.weightx = 1.f;
+        JPanel filler = new JPanel();
+        filler.setOpaque(false);
+        settingsPanel.add(filler, gbc);
+
     }
-
-
 }

@@ -7,8 +7,6 @@ import com.michal.debski.utilities.Color;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import javax.swing.*;
-
 
 public class Scene implements GameHandlerInterface, SceneInterface
 {
@@ -19,6 +17,7 @@ public class Scene implements GameHandlerInterface, SceneInterface
     private Model myModel, floor, cube;
 
     private Gui gui;
+
 
 
 
@@ -61,11 +60,8 @@ public class Scene implements GameHandlerInterface, SceneInterface
 
 
         gui = new Gui();
-        for(Panel panel : Containers.panelContainer)
-        {
-            PanelEntity panelEntity =  panel.createPanelEntity(gui.getMainPanel());
-            gui.addToMainPanel(panelEntity.getPanel(), panelEntity.getPanelName());
-        }
+
+        gui.createGui(Containers.panelContainer);
 
     }
 
@@ -92,8 +88,6 @@ public class Scene implements GameHandlerInterface, SceneInterface
     {
         processCameraInput();
 
-        if(Input.IsKeyPressed(Keycode.E))
-            System.out.println("EEEEEE");
     }
 
     @Override
