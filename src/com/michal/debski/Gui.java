@@ -5,6 +5,10 @@ import org.w3c.dom.css.Rect;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.WindowAdapter;
 import java.util.ArrayList;
 import java.util.concurrent.Flow;
 
@@ -75,9 +79,19 @@ public class Gui extends JFrame
         mainPanel.add(settingsScrollPanel, "Settings");
         cardLayout.show(mainPanel, "Settings");
 
-        
-
         setContentPane(globalPanel);
+
+        addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                System.out.println("lol");
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+
+            }
+        });
 
         setType(JFrame.Type.UTILITY);
         //setAlwaysOnTop(true);
@@ -141,7 +155,8 @@ public class Gui extends JFrame
         gbc.weightx = 1.f;
         JPanel filler = new JPanel();
         filler.setOpaque(false);
-        settingsPanel.add(filler, gbc);
 
+        settingsPanel.add(filler, gbc);
+        cardLayout.show(mainPanel, "Light");
     }
 }

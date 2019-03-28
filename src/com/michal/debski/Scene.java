@@ -55,8 +55,10 @@ public class Scene implements GameHandlerInterface, SceneInterface
         //camera.lockCameraAt(myModel.getPosition(), true);
 
         dirLight = new DirectionalLight(new Vector3f( -20.f, 30.f, -30.f), new Color( 3.5f));
-        //dirLight.setOribitng(true);
-        dirLight.setOrbitingAroundPosition(myModel.getTransform().getPosition(), 50.f, 0.5f,true);
+        /*dirLight.setOribitng(true);
+        dirLight.setOrbitingRadius(0.5f);
+        dirLight.setOrbitingSpeed(0.5f);*/
+        dirLight.setOrbitingAroundPosition(myModel.getTransform().getPosition(), 50.0f, 2.5f,true);
 
 
         gui = new Gui();

@@ -5,12 +5,12 @@ import com.michal.debski.Panel;
 import com.michal.debski.loader.Loader;
 import com.michal.debski.utilities.Color;
 
+import com.michal.debski.utilities.PanelUtility;
 import com.michal.debski.utilities.mdTimer;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 
@@ -67,10 +67,13 @@ public class Light extends Model implements Panel
     public void setOribitng(boolean orbiting)
     {
         this.orbiting = orbiting;
-        if(orbiting)
+        if(orbiting) {
             orbitingTimer.start();
-        else
+            orbitingRadius = new Vector2f().distance(new Vector2f(getTransform().getPosition().x, getTransform().getPosition().z));
+        }
+        else {
             orbitingTimer.stop();
+        }
     }
 
     public void setOrbitingSpeed(float orbitingSpeed)
@@ -114,19 +117,13 @@ public class Light extends Model implements Panel
         if(renderLightCube)
         {
             ShaderManager.GetShader().setBool("lightActive", false);
-            if(orbiting && orbitingPosition != null)
+            if(orbiting)
             {
-                getTransform().getPosition().x = orbitingPosition.x + (float)Math.sin(orbitingTimer.getCurrentTime() * orbitingSpeed) * orbitingRadius;
-                getTransform().getPosition().z = orbitingPosition.z + (float)Math.cos(orbitingTimer.getCurrentTime() * orbitingSpeed) * orbitingRadius;
-            }
-            else if(orbiting)
-            {
-                getTransform().getPosition().x += (float)Math.sin(orbitingTimer.getCurrentTime() * orbitingSpeed) * orbitingRadius;
-                getTransform().getPosition().z += (float)Math.cos(orbitingTimer.getCurrentTime() * orbitingSpeed) * orbitingRadius;
+                getTransform().getPosition().x = (float)Math.sin(orbitingTimer.getCurrentTime() * orbitingSpeed) * orbitingRadius;
+                getTransform().getPosition().z = (float)Math.cos(orbitingTimer.getCurrentTime() * orbitingSpeed) * orbitingRadius;
             }
 
             setColor(color);
-            getTransform().setPosition(getTransform().getPosition());
             Render();
         }
 
@@ -154,30 +151,55 @@ public class Light extends Model implements Panel
     {
         JPanel panel = new JPanel();
         String panelName = "Light";
-        panel.setLayout(new BorderLayout());
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        JPanel settingsPanel = new JPanel();
-        settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
-        JCheckBox orbiting = new JCheckBox("Is orbiting: ");
-        orbiting.setSelected(this.orbiting);
-        orbiting.addItemListener(e -> {
-            if(e.getStateChange() == ItemEvent.SELECTED)
+        // Get panel with transform settings
+        JPanel transformPanel = getTransform().createPanel();
+
+        //settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
+        JPanel orbitingPanel = new JPanel();
+
+
+        JLabel label = new JLabel("Radius");
+        orbitingPanel.add(label);
+
+        int sliderWidth = 300;
+        int sliderHeight = 50;
+        JSlider radiusSlider = new JSlider(JSlider.HORIZONTAL, 0, 50, (int)orbitingRadius);
+        radiusSlider.addChangeListener(e -> {
+            orbitingRadius = radiusSlider.getValue();
+        });
+        radiusSlider.setMajorTickSpacing(10);
+        radiusSlider.setPaintTicks(true);
+        radiusSlider.setPaintLabels(true);
+        radiusSlider.setMaximumSize(new Dimension(sliderWidth, sliderHeight));
+        radiusSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        orbitingPanel.add(radiusSlider);
+
+
+        JCheckBox orbitingCheckBox = new JCheckBox("Is orbiting: ");
+        orbitingCheckBox.setSelected(this.orbiting);
+        PanelUtility.SetPanelEnabled(transformPanel, !this.orbiting);
+        radiusSlider.setEnabled(this.orbiting);
+        orbitingCheckBox.addItemListener(e -> {
+            if(e.getStateChange() == ItemEvent.SELECTED) {
                 setOribitng(true);
-            else
+                PanelUtility.SetPanelEnabled(transformPanel, false);
+                radiusSlider.setEnabled(true);
+            }
+            else {
                 setOribitng(false);
+                PanelUtility.SetPanelEnabled(transformPanel, true);
+                radiusSlider.setEnabled(false);
+            }
         });
-        settingsPanel.add(orbiting);
+        orbitingPanel.add(orbitingCheckBox);
 
-        JSlider posXSlider = new JSlider(JSlider.HORIZONTAL, -50, 50, (int)getTransform().getPosition().x);
-        posXSlider.addChangeListener(e -> {
-            getTransform().getPosition().x = posXSlider.getValue();
-        });
-        posXSlider.setMajorTickSpacing(10);
-        posXSlider.setPaintTicks(true);
-        posXSlider.setPaintLabels(true);
-        settingsPanel.add(posXSlider);
-
-        panel.add(settingsPanel);
+        transformPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        orbitingPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(transformPanel);
+        panel.add(orbitingPanel);
 
 
         // Bottom GO BACK button
