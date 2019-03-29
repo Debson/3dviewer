@@ -1,8 +1,13 @@
 package com.michal.debski.loader;
 
+import com.michal.debski.Panel;
+import com.michal.debski.PanelEntity;
+import com.michal.debski.utilities.PanelUtility;
 import org.joml.Vector3f;
 
-public class mdMaterial
+import javax.swing.*;
+
+public class mdMaterial implements Panel
 {
     public Vector3f ambient;
     public Vector3f diffuse;
@@ -23,5 +28,42 @@ public class mdMaterial
         this.diffuse = diffuse;
         this.specular = specular;
         this.shininess = shininess;
+    }
+
+    @Override
+    public PanelEntity createPanelEntity()
+    {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+
+        /*
+        * Ambient
+        * slider
+        * slider
+        * slider
+        *
+        * Diffuse
+        * slider
+        * slider
+        * slider
+        *
+        * Specular
+        * slider
+        * slider
+        * slider
+        *
+        * Shininess
+        * slider
+        * */
+
+        panel = PanelUtility.CreatePanelFromMultipleVector3f(new String[]{"Ambient", "Diffuse", "Specular"},
+                new Vector3f[]{ambient, diffuse, specular},
+                new int[]{0, 0, 0},
+                new int[]{100, 100 , 100},
+                100);
+
+        panel.setBorder(BorderFactory.createTitledBorder("Material"));
+
+        return new PanelEntity(panel, "Material");
     }
 }

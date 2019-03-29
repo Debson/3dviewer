@@ -39,6 +39,7 @@ public class Core
         if(window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
+        Window.SetWindow(window);
 
         setupGLFW(gameHandler);
 

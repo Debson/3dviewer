@@ -5,5 +5,5 @@ import java.awt.*;
 
 public interface Panel
 {
-    PanelEntity createPanelEntity(JPanel mainPanel, CardLayout mainPanelCardLayout);
+    PanelEntity createPanelEntity();
 }

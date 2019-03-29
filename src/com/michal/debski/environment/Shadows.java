@@ -24,7 +24,7 @@ public class Shadows
 
 
     private Matrix4f lightSpaceMatrix;
-    public final float nearPlane = 1.f;
+    public final float nearPlane = 1.0f;
     public final float farPlane = 100.0f;
     public final float lightProjectionSize = 100.f;
     private Vector3f lightPos;

@@ -39,16 +39,16 @@ public class Scene implements GameHandlerInterface, SceneInterface
         String path = "assets\\cube.obj";
         String path2 = "assets\\nanosuit\\nanosuit.obj";
         String path3 = "assets\\teapot.obj";
-        String path4 = "assets\\teddybear.obj";
+        String path4 = "assets\\head.obj";
 
-        myModel = new Model(path2);
+        myModel = new Model(path4);
         myModel.getTransform().setPosition(new Vector3f(0.f, 0.f, 0.f));
         myModel.getTransform().setScale(new Vector3f(1.f));
         //myModel.setColor(new Color(1.f, 0.5f, 1.f));
-        floor = new Model(Loader.PrimitiveType.Plane);
+        floor = new Model("Floor", Loader.PrimitiveType.Plane);
         floor.setColor(new Color(1.f, 0.f, 1.f, 1.f));
 
-        cube = new Model(Loader.PrimitiveType.Cube);
+        cube = new Model("Cube", Loader.PrimitiveType.Cube);
         //cube.setScale(new Vector3f(50.f, 1.f, 50.f));
         cube.getTransform().setPosition(new Vector3f(0.f, 1.f, 10.f));
 
@@ -58,7 +58,7 @@ public class Scene implements GameHandlerInterface, SceneInterface
         /*dirLight.setOribitng(true);
         dirLight.setOrbitingRadius(0.5f);
         dirLight.setOrbitingSpeed(0.5f);*/
-        dirLight.setOrbitingAroundPosition(myModel.getTransform().getPosition(), 50.0f, 2.5f,true);
+        //dirLight.setOrbitingAroundPosition(myModel.getTransform().getPosition(), 50.0f, 2.5f,true);
 
 
         gui = new Gui();
@@ -113,6 +113,7 @@ public class Scene implements GameHandlerInterface, SceneInterface
     {
         myModel = null;
         myModel = new Model(pathOfDroppedFile);
+        gui.replaceModel("Nanosuit", myModel);
     }
 
     @Override

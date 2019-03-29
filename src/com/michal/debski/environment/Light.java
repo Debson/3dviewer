@@ -11,18 +11,20 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import javax.swing.*;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 
 import static org.lwjgl.opengl.GL30.*;
 
-public class Light extends Model implements Panel
+public class Light extends Model
 {
     // This should be the parent class. Child classes: directional light, point light
     // Light method render should be called before any drawing, so it will set boolean variable
     // that manages lighting in shader to true, so the scene will be drawn with lighting.
     protected float strength;
-    protected Color color;
     protected boolean lightActive = true;
     private boolean orbiting = false;
     private Vector3f orbitingPosition = null;
@@ -37,21 +39,18 @@ public class Light extends Model implements Panel
 
     public Light(Vector3f position)
     {
-        super(Loader.PrimitiveType.Cube);
+        super("Light", Loader.PrimitiveType.Cube);
+        setColor(new Color(1.f));
         this.getTransform().setPosition(position);
-        this.color = new Color(1.f);
         shadows = new Shadows(this.getTransform().getPosition());
-        Containers.AddPanelContainer(this);
-
     }
 
     public Light(Vector3f position, Color color)
     {
-        super(Loader.PrimitiveType.Cube);
+        super("Light", Loader.PrimitiveType.Cube);
         this.getTransform().setPosition(position);
-        this.color = color;
+        setColor(color);
         shadows = new Shadows(this.getTransform().getPosition());
-        Containers.AddPanelContainer(this);
     }
 
     public void on()
@@ -106,9 +105,9 @@ public class Light extends Model implements Panel
         if(lightActive)
         {
 
-            ShaderManager.GetShader().setVec3("light.direction", getTransform().getPosition());
+            /*ShaderManager.GetShader().setVec3("light.direction", getTransform().getPosition());
             //ShaderManager.GetShader().setVec3("lightPos", position);
-            ShaderManager.GetShader().setVec3("light.color", color.r, color.g, color.b);
+            ShaderManager.GetShader().setVec3("light.color", color.r, color.g, color.b);*/
         }
     }
 
@@ -123,7 +122,6 @@ public class Light extends Model implements Panel
                 getTransform().getPosition().z = (float)Math.cos(orbitingTimer.getCurrentTime() * orbitingSpeed) * orbitingRadius;
             }
 
-            setColor(color);
             Render();
         }
 
@@ -147,23 +145,29 @@ public class Light extends Model implements Panel
     }
 
     @Override
-    public PanelEntity createPanelEntity(JPanel mainPanel, CardLayout mainPanelCardLayout)
+    public PanelEntity createPanelEntity()
     {
         JPanel panel = new JPanel();
         String panelName = "Light";
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
         // Get panel with transform settings
-        JPanel transformPanel = getTransform().createPanel();
+        JPanel transformPanel = getTransform().createPanelEntity().getPanel();
 
-        //settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
+        // Change scale label to "Intensity"
+        /*JLabel scaleLabel = (JLabel) transformPanel.getComponent(6);
+        scaleLabel.setText("Intensity");*/
+
+                //settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
         JPanel orbitingPanel = new JPanel();
+        orbitingPanel.setLayout(new BoxLayout(orbitingPanel, BoxLayout.PAGE_AXIS));
 
 
-        JLabel label = new JLabel("Radius");
+        JLabel label = new JLabel("Orbiting Radius");
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
         orbitingPanel.add(label);
 
-        int sliderWidth = 300;
+        int sliderWidth = 200;
         int sliderHeight = 50;
         JSlider radiusSlider = new JSlider(JSlider.HORIZONTAL, 0, 50, (int)orbitingRadius);
         radiusSlider.addChangeListener(e -> {
@@ -177,47 +181,53 @@ public class Light extends Model implements Panel
 
         orbitingPanel.add(radiusSlider);
 
+        label = new JLabel("Orbiting Speed");
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
+        orbitingPanel.add(label);
+
+        JSlider speedSlider = new JSlider(JSlider.HORIZONTAL, 0, 50, (int)orbitingSpeed * 10);
+        speedSlider.addChangeListener(e -> {
+            orbitingSpeed = (float)speedSlider.getValue() / 10.f;
+        });
+        speedSlider.setMajorTickSpacing(10);
+        speedSlider.setPaintTicks(true);
+        speedSlider.setPaintLabels(true);
+        speedSlider.setMaximumSize(new Dimension(sliderWidth, sliderHeight));
+        speedSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        orbitingPanel.add(speedSlider);
+
 
         JCheckBox orbitingCheckBox = new JCheckBox("Is orbiting: ");
         orbitingCheckBox.setSelected(this.orbiting);
         PanelUtility.SetPanelEnabled(transformPanel, !this.orbiting);
         radiusSlider.setEnabled(this.orbiting);
+        speedSlider.setEnabled(this.orbiting);
         orbitingCheckBox.addItemListener(e -> {
             if(e.getStateChange() == ItemEvent.SELECTED) {
                 setOribitng(true);
                 PanelUtility.SetPanelEnabled(transformPanel, false);
                 radiusSlider.setEnabled(true);
+                speedSlider.setEnabled(true);
             }
             else {
                 setOribitng(false);
                 PanelUtility.SetPanelEnabled(transformPanel, true);
                 radiusSlider.setEnabled(false);
+                speedSlider.setEnabled(false);
             }
         });
+
         orbitingPanel.add(orbitingCheckBox);
 
-        transformPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        orbitingPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // Create color picker panel
+        JPanel colorPanel = getColor().createPanelEntity().getPanel();
+
+        orbitingPanel.add(colorPanel);
+
         panel.add(transformPanel);
         panel.add(orbitingPanel);
 
-
-        // Bottom GO BACK button
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        //panel.setLayout(new GridLayout());
-        JButton goBackButton = new JButton("Go back");
-        goBackButton.addActionListener(e -> {
-            mainPanelCardLayout.show(mainPanel, "Settings");
-        });
-        buttonPanel.add(goBackButton);
-        buttonPanel.setOpaque(false);
-        //button.setPreferredSize(new Dimension(100, 100));
-        panel.add(buttonPanel, BorderLayout.SOUTH);
-
-
-
-        //panel.setBackground(java.awt.Color.RED);
         panel.setPreferredSize(new Dimension(100, 100));
 
         return new PanelEntity(panel, panelName);

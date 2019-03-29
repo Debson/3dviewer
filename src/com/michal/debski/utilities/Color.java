@@ -1,6 +1,13 @@
 package com.michal.debski.utilities;
 
-public class Color
+import com.michal.debski.Panel;
+import com.michal.debski.PanelEntity;
+
+import javax.swing.*;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
+import java.awt.*;
+
+public class Color implements Panel
 {
     public float r, g, b, a;
 
@@ -26,5 +33,44 @@ public class Color
         this.g = initValue;
         this.b = initValue;
         this.a = initValue;
+    }
+
+    @Override
+    public PanelEntity createPanelEntity()
+    {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        JColorChooser jcc = new JColorChooser(new java.awt.Color(255));
+        jcc.getSelectionModel().addChangeListener(e -> {
+            java.awt.Color newColor = jcc.getColor();
+            r = (float)newColor.getRed() / 255.f;
+            g = (float)newColor.getGreen() / 255.f;
+            b = (float)newColor.getBlue() / 255.f;
+        });
+        jcc.setPreviewPanel(new JPanel());
+        jcc.setMaximumSize(new Dimension(300, 200));
+
+        JPanel p = (JPanel)jcc.getChooserPanels()[3];
+        p.remove(1);
+
+        JPanel p2 = (JPanel) p.getComponent(0);
+        // Remove 9 components(sliders and their lables...)
+        for(int i = 0; i < 9; i++)
+            p2.remove(0);
+        AbstractColorChooserPanel[] panels = jcc.getChooserPanels();
+        for(AbstractColorChooserPanel accp : panels)
+        {
+            if(accp.getDisplayName().equals("RGB") == false)
+            {
+                jcc.removeChooserPanel(accp);
+            }
+            accp.setAlignmentX(Component.LEFT_ALIGNMENT);
+        }
+        jcc.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        panel.add(jcc);
+        panel.setBorder(BorderFactory.createTitledBorder("Colour"));
+
+        return new PanelEntity(panel, "ColorPicker");
     }
 }
