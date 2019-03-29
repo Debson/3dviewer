@@ -50,159 +50,102 @@ public class Transform implements Panel
         int sliderHeight = 50;
 
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setLayout(new FlowLayout());
 
         JPanel slidersContainer = new JPanel();
         slidersContainer.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
 
-        JLabel label = new JLabel("X");
-        //label.setAlignmentX(Component.LEFT_ALIGNMENT);
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(0, 0, 10, 0);
-        //gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-        slidersContainer.add(label, gbc);
-
         JLabel posXLabel = new JLabel(Float.toString(position.x));
         posXLabel.setBorder(BorderFactory.createLineBorder(Color.black));
-        //posXLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        posXLabel.setMinimumSize(new Dimension(40, 20));
         posXLabel.setPreferredSize(new Dimension(40, 20));
-        posXLabel.setMaximumSize(new Dimension(40, 20));
 
         JSlider posXSlider = new JSlider(JSlider.HORIZONTAL, -50, 50, (int)position.x);
         posXSlider.addChangeListener(e -> {
             position.x = posXSlider.getValue();
             posXLabel.setText(String.format("%-2.2f", position.x));
         });
-        /*posXSlider.setMajorTickSpacing(20);
-        posXSlider.setPaintTicks(true);
-        posXSlider.setPaintLabels(true);*/
-        //posXSlider.setMinimumSize(new Dimension(sliderWidth, sliderHeight));
-        posXSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.weightx = 0.5;
-        //gbc.anchor = GridBagConstraints.PAGE_START;
-        slidersContainer.add(posXSlider);
-
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.weightx = 0.5;
-        //gbc.anchor = GridBagConstraints.FIRST_LINE_END;
-        slidersContainer.add(posXLabel, gbc);
-
-        label = new JLabel("Y");
-        //label.setAlignmentX(Component.LEFT_ALIGNMENT);
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weightx = 0;
-        //gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-        slidersContainer.add(label, gbc);
 
         JLabel posYLabel = new JLabel(Float.toString(position.y));
         posYLabel.setBorder(BorderFactory.createLineBorder(Color.black));
-        //posXLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        posYLabel.setMinimumSize(new Dimension(40, 20));
-        posYLabel.setPreferredSize(new Dimension(40, 20));
-        posYLabel.setMaximumSize(new Dimension(40, 20));
+        posYLabel.setPreferredSize(new Dimension(20, 20));
 
         JSlider posYSlider = new JSlider(JSlider.HORIZONTAL, -50, 50, (int)position.y);
         posYSlider.addChangeListener(e -> {
             position.y = posYSlider.getValue();
             posYLabel.setText(String.format("%-2.2f", position.y));
         });
-        /*posXSlider.setMajorTickSpacing(20);
-        posXSlider.setPaintTicks(true);
-        posXSlider.setPaintLabels(true);*/
-        //posYSlider.setMaximumSize(new Dimension(sliderWidth, sliderHeight));
-        //posXSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.weightx = 0.5;
-        //gbc.anchor = GridBagConstraints.PAGE_START;
-        slidersContainer.add(posYSlider);
 
-        gbc.gridx = 2;
-        gbc.gridy = 1;
-        gbc.weightx = 0.5;
-        //gbc.anchor = GridBagConstraints.FIRST_LINE_END;
-        slidersContainer.add(posYLabel, gbc);
-
-
-
-        label = new JLabel("Z");
-        //label.setAlignmentX(Component.LEFT_ALIGNMENT);
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 0;
-        //gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-        slidersContainer.add(label, gbc);
 
         JLabel posZLabel = new JLabel(Float.toString(position.z));
         posZLabel.setBorder(BorderFactory.createLineBorder(Color.black));
-        //posXLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        posZLabel.setMinimumSize(new Dimension(40, 20));
-        posZLabel.setPreferredSize(new Dimension(40, 20));
-        posZLabel.setMaximumSize(new Dimension(40, 20));
+
+        posZLabel.setPreferredSize(new Dimension(20, 20));
 
         JSlider posZSlider = new JSlider(JSlider.HORIZONTAL, -50, 50, (int)position.z);
         posZSlider.addChangeListener(e -> {
             position.z = posZSlider.getValue();
             posZLabel.setText(String.format("%-2.2f", position.z));
         });
-        /*posXSlider.setMajorTickSpacing(20);
-        posXSlider.setPaintTicks(true);
-        posXSlider.setPaintLabels(true);*/
-        //posZSlider.setMaximumSize(new Dimension(sliderWidth, sliderHeight));
-        //posXSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.weightx = 0.5;
-        //gbc.anchor = GridBagConstraints.PAGE_START;
-        slidersContainer.add(posZSlider);
-
-        gbc.gridx = 2;
-        gbc.gridy = 2;
-        gbc.weightx = 0.5;
-        //gbc.anchor = GridBagConstraints.FIRST_LINE_END;
-        slidersContainer.add(posZLabel, gbc);
 
 
-
+        JLabel scaleLabel = new JLabel(Float.toString(position.z));
+        scaleLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+        scaleLabel.setPreferredSize(new Dimension(20, 20));
 
         JSlider scaleSlider = new JSlider(JSlider.HORIZONTAL, 0, 50, (int)scale.x * 10);
         scaleSlider.addChangeListener(e -> {
             setScale(new Vector3f((float)scaleSlider.getValue() / 10.f));
+            scaleLabel.setText(String.format("%-2.2f", getScale().x));
         });
-        scaleSlider.setMajorTickSpacing(10);
-        scaleSlider.setPaintTicks(true);
-        scaleSlider.setPaintLabels(true);
-        scaleSlider.setMaximumSize(new Dimension(sliderWidth, sliderHeight));
-        scaleSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        /*label = new JLabel("Position X");
-        panel.add(label);
-        panel.add(posXSlider);*/
 
-        slidersContainer.setMaximumSize(new Dimension(350, 100));
 
+        JLabel label = new JLabel("X");
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.1;
+        gbc.weighty = 0.1;
+        gbc.insets = new Insets(2, 2, 2, 2);
+        slidersContainer.add(label, gbc);
+        gbc.gridx++;
+        slidersContainer.add(posXSlider, gbc);
+        gbc.gridx++;
+        slidersContainer.add(posXLabel, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        label = new JLabel("Y");
+        slidersContainer.add(label, gbc);
+        gbc.gridx++;
+        slidersContainer.add(posYSlider, gbc);
+        gbc.gridx++;
+        slidersContainer.add(posYLabel, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        label = new JLabel("Z");
+        slidersContainer.add(label, gbc);
+        gbc.gridx++;
+        slidersContainer.add(posZSlider, gbc);
+        gbc.gridx++;
+        slidersContainer.add(posZLabel, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        label = new JLabel("Scale");
+        slidersContainer.add(label, gbc);
+        gbc.gridx++;
+        slidersContainer.add(scaleSlider, gbc);
+        gbc.gridx++;
+        slidersContainer.add(scaleLabel, gbc);
+
+
+        slidersContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(slidersContainer);
 
-
-        /*label = new JLabel("Position Y");
-        panel.add(label);
-        panel.add(posYSlider);
-        label = new JLabel("Position Z");
-        panel.add(label);
-        panel.add(posZSlider);*/
-        /*label = new JLabel("Scale(x10)");
-        panel.add(label);
-        panel.add(scaleSlider);*/
-
+        panel.setPreferredSize(new Dimension(200, 140));
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setBorder(BorderFactory.createTitledBorder("Position"));
 
         return new PanelEntity(panel, "Transform");

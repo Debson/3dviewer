@@ -149,7 +149,7 @@ public class Light extends Model
     {
         JPanel panel = new JPanel();
         String panelName = "Light";
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         // Get panel with transform settings
         JPanel transformPanel = getTransform().createPanelEntity().getPanel();
@@ -160,7 +160,7 @@ public class Light extends Model
 
                 //settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
         JPanel orbitingPanel = new JPanel();
-        orbitingPanel.setLayout(new BoxLayout(orbitingPanel, BoxLayout.PAGE_AXIS));
+        orbitingPanel.setLayout(new BoxLayout(orbitingPanel, BoxLayout.Y_AXIS));
 
 
         JLabel label = new JLabel("Orbiting Radius");
@@ -223,12 +223,10 @@ public class Light extends Model
         // Create color picker panel
         JPanel colorPanel = getColor().createPanelEntity().getPanel();
 
-        orbitingPanel.add(colorPanel);
-
         panel.add(transformPanel);
+        panel.add(colorPanel);
         panel.add(orbitingPanel);
-
-        panel.setPreferredSize(new Dimension(100, 100));
+        
 
         return new PanelEntity(panel, panelName);
     }
