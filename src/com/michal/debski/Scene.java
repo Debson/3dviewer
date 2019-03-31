@@ -2,7 +2,7 @@ package com.michal.debski;
 
 import com.michal.debski.environment.DirectionalLight;
 import com.michal.debski.loader.Loader;
-import com.michal.debski.utilities.Color;
+import com.michal.debski.utilities.Colour;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -44,9 +44,9 @@ public class Scene implements GameHandlerInterface, SceneInterface
         myModel = new Model(path4);
         myModel.getTransform().setPosition(new Vector3f(0.f, 0.f, 0.f));
         myModel.getTransform().setScale(new Vector3f(1.f));
-        //myModel.setColor(new Color(1.f, 0.5f, 1.f));
+        //myModel.setColor(new Colour(1.f, 0.5f, 1.f));
         floor = new Model("Floor", Loader.PrimitiveType.Plane);
-        floor.setColor(new Color(1.f, 0.f, 1.f, 1.f));
+        floor.setColor(new Colour(1.f, 0.f, 1.f, 1.f));
 
         cube = new Model("Cube", Loader.PrimitiveType.Cube);
         //cube.setScale(new Vector3f(50.f, 1.f, 50.f));
@@ -54,7 +54,8 @@ public class Scene implements GameHandlerInterface, SceneInterface
 
         //camera.lockCameraAt(myModel.getPosition(), true);
 
-        dirLight = new DirectionalLight(new Vector3f( -20.f, 30.f, -30.f), new Color( 3.5f));
+        dirLight = new DirectionalLight(new Vector3f( -20.f, 30.f, -30.f), new Colour( 1.f));
+        dirLight.getTransform().setScale(new Vector3f(3.f));
         /*dirLight.setOribitng(true);
         dirLight.setOrbitingRadius(0.5f);
         dirLight.setOrbitingSpeed(0.5f);*/

@@ -1,9 +1,8 @@
 package com.michal.debski.environment;
 
 import com.michal.debski.*;
-import com.michal.debski.Panel;
 import com.michal.debski.loader.Loader;
-import com.michal.debski.utilities.Color;
+import com.michal.debski.utilities.Colour;
 
 import com.michal.debski.utilities.PanelUtility;
 import com.michal.debski.utilities.mdTimer;
@@ -11,9 +10,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import javax.swing.*;
-import javax.swing.colorchooser.AbstractColorChooserPanel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 
@@ -40,12 +36,12 @@ public class Light extends Model
     public Light(Vector3f position)
     {
         super("Light", Loader.PrimitiveType.Cube);
-        setColor(new Color(1.f));
+        setColor(new Colour(1.f));
         this.getTransform().setPosition(position);
         shadows = new Shadows(this.getTransform().getPosition());
     }
 
-    public Light(Vector3f position, Color color)
+    public Light(Vector3f position, Colour color)
     {
         super("Light", Loader.PrimitiveType.Cube);
         this.getTransform().setPosition(position);
@@ -226,7 +222,7 @@ public class Light extends Model
         panel.add(transformPanel);
         panel.add(colorPanel);
         panel.add(orbitingPanel);
-        
+
 
         return new PanelEntity(panel, panelName);
     }

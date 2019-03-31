@@ -50,7 +50,7 @@ public class Transform implements Panel
         int sliderHeight = 50;
 
         JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout());
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         JPanel slidersContainer = new JPanel();
         slidersContainer.setLayout(new GridBagLayout());
@@ -144,7 +144,7 @@ public class Transform implements Panel
         slidersContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(slidersContainer);
 
-        panel.setPreferredSize(new Dimension(200, 140));
+        //panel.setPreferredSize(new Dimension(200, 140));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setBorder(BorderFactory.createTitledBorder("Position"));
 

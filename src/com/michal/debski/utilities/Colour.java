@@ -7,11 +7,11 @@ import javax.swing.*;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import java.awt.*;
 
-public class Color implements Panel
+public class Colour implements Panel
 {
     public float r, g, b, a;
 
-    public Color(float r, float g, float b, float a)
+    public Colour(float r, float g, float b, float a)
     {
         this.r = r;
         this.g = g;
@@ -19,7 +19,7 @@ public class Color implements Panel
         this.a = a;
     }
 
-    public Color(float r, float g, float b)
+    public Colour(float r, float g, float b)
     {
         this.r = r;
         this.g = g;
@@ -27,7 +27,7 @@ public class Color implements Panel
         this.a = 1.f;
     }
 
-    public Color(float initValue)
+    public Colour(float initValue)
     {
         this.r = initValue;
         this.g = initValue;
@@ -39,8 +39,9 @@ public class Color implements Panel
     public PanelEntity createPanelEntity()
     {
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        JColorChooser jcc = new JColorChooser(new java.awt.Color(255));
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+        JColorChooser jcc = new JColorChooser(new java.awt.Color(255, 255, 255, 255));
         jcc.getSelectionModel().addChangeListener(e -> {
             java.awt.Color newColor = jcc.getColor();
             r = (float)newColor.getRed() / 255.f;
@@ -48,7 +49,7 @@ public class Color implements Panel
             b = (float)newColor.getBlue() / 255.f;
         });
         jcc.setPreviewPanel(new JPanel());
-        jcc.setMaximumSize(new Dimension(300, 200));
+        //jcc.setMaximumSize(new Dimension(300, 200));
 
         JPanel p = (JPanel)jcc.getChooserPanels()[3];
         p.remove(1);
@@ -64,11 +65,11 @@ public class Color implements Panel
             {
                 jcc.removeChooserPanel(accp);
             }
-            accp.setAlignmentX(Component.LEFT_ALIGNMENT);
+            //accp.setAlignmentX(Component.LEFT_ALIGNMENT);
         }
-        jcc.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         panel.add(jcc);
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setBorder(BorderFactory.createTitledBorder("Colour"));
 
         return new PanelEntity(panel, "ColorPicker");

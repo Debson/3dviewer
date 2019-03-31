@@ -4,9 +4,7 @@ import org.joml.Vector3f;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.awt.Color;
 
 public class PanelUtility
 {
@@ -28,56 +26,133 @@ public class PanelUtility
         int panelWidth = 200;
 
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.setMaximumSize(new Dimension(panelWidth, 0));
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
+        JPanel slidersContainer = new JPanel();
+        slidersContainer.setLayout(new GridBagLayout());
 
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridy = 0;
         // Put it into GirdLayout with 3 columns. First label, slider and slider value label
+        //int gridyCounter = 0;
         for(int i = 0; i < labels.length; i++)
         {
-            JLabel label = new JLabel(labels[i]);
-            panel.add(label);
+            JLabel label = new JLabel(labels[i], JLabel.CENTER);
 
             Vector3f vector = vectorList[i];
-            System.out.println(vectorList[i].x * 100);
+
+            // X
+            JLabel valueXLabel = new JLabel(String.format("%-2.2f", vector.x));
+            valueXLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+            valueXLabel.setPreferredSize(new Dimension(40, 20));
+
             JSlider sliderX = new JSlider(JSlider.HORIZONTAL, minVals[i], maxVals[i], (int)(vector.x * multiplier));
-            sliderX.setAlignmentX(Component.LEFT_ALIGNMENT);
             sliderX.addChangeListener(e ->{
                 vector.x = (float)sliderX.getValue() / (float)multiplier;
+                valueXLabel.setText(String.format("%-2.2f", vector.x));
             });
 
-            panel.add(sliderX);
+            JLabel valueYLabel = new JLabel(String.format("%-2.2f", vector.x));
+            valueYLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+            valueYLabel.setPreferredSize(new Dimension(40, 20));
 
 
+            // Y
             JSlider sliderY = new JSlider(JSlider.HORIZONTAL, minVals[i], maxVals[i], (int)(vector.y * multiplier));
-            sliderY.setAlignmentX(Component.LEFT_ALIGNMENT);
             sliderY.addChangeListener(e ->{
                 vector.y = (float)sliderY.getValue() / (float)multiplier;
+                valueYLabel.setText(String.format("%-2.2f", vector.y));
             });
 
-            panel.add(sliderY);
+
+            // Z
+            JLabel valueZLabel = new JLabel(String.format("%-2.2f", vector.x));
+            valueZLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+            valueZLabel.setPreferredSize(new Dimension(40, 20));
 
             JSlider sliderZ = new JSlider(JSlider.HORIZONTAL, minVals[i], maxVals[i], (int)(vector.z * multiplier));
-            sliderZ.setAlignmentX(Component.LEFT_ALIGNMENT);
             sliderZ.addChangeListener(e ->{
                 vector.z = (float)sliderZ.getValue() / (float)multiplier;
+                valueZLabel.setText(String.format("%-2.2f", vector.z));
             });
 
-            panel.add(sliderZ);
 
-            JSlider sliderAll = new JSlider(JSlider.HORIZONTAL, minVals[i], maxVals[i], (int)(vector.z * multiplier));
-            sliderAll.setAlignmentX(Component.LEFT_ALIGNMENT);
-            sliderAll.addChangeListener(e ->{
-                vector.x = (float)sliderAll.getValue() / (float)multiplier;
-                vector.y = (float)sliderAll.getValue() / (float)multiplier;
-                vector.z = (float)sliderAll.getValue() / (float)multiplier;
+            // XYZ
+            JLabel valueXYZLabel = new JLabel(String.format("%-2.2f", vector.x));
+            valueXYZLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+            valueXYZLabel.setPreferredSize(new Dimension(40, 20));
 
-                sliderX.setValue(sliderAll.getValue());
-                sliderY.setValue(sliderAll.getValue());
-                sliderZ.setValue(sliderAll.getValue());
+            JSlider sliderXYZ = new JSlider(JSlider.HORIZONTAL, minVals[i], maxVals[i], (int)(vector.z * multiplier));
+            sliderXYZ.addChangeListener(e ->{
+                vector.x = (float)sliderXYZ.getValue() / (float)multiplier;
+                vector.y = (float)sliderXYZ.getValue() / (float)multiplier;
+                vector.z = (float)sliderXYZ.getValue() / (float)multiplier;
+
+                sliderX.setValue(sliderXYZ.getValue());
+                sliderY.setValue(sliderXYZ.getValue());
+                sliderZ.setValue(sliderXYZ.getValue());
+                valueXYZLabel.setText(String.format("%-2.2f", vector.x));
             });
 
-            panel.add(sliderAll);
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.anchor = GridBagConstraints.WEST;
+            //gbc.weighty = 0.1;
+            //gbc.weightx = 0.5;
+            gbc.insets = new Insets(2, 2, 2, 2);
+            gbc.gridx = 0;
+
+
+            // X
+            gbc.gridx = 1;
+            slidersContainer.add(label, gbc);
+            gbc.gridx = 0;
+            gbc.gridy++;
+            label = new JLabel("X");
+            slidersContainer.add(label, gbc);
+            gbc.gridx++;
+            slidersContainer.add(sliderX, gbc);
+            gbc.gridx++;
+            slidersContainer.add(valueXLabel, gbc);
+
+            // Y
+            gbc.gridy++;
+            gbc.gridx = 0;
+            label = new JLabel("Y");
+            slidersContainer.add(label, gbc);
+            gbc.gridx++;
+            slidersContainer.add(sliderY, gbc);
+            gbc.gridx++;
+            slidersContainer.add(valueYLabel, gbc);
+
+            // Z
+            gbc.gridy++;
+            gbc.gridx = 0;
+            label = new JLabel("Z");
+            slidersContainer.add(label, gbc);
+            gbc.gridx++;
+            slidersContainer.add(sliderZ, gbc);
+            gbc.gridx++;
+            slidersContainer.add(valueZLabel, gbc);
+
+            // XYZ
+            gbc.gridy++;
+            gbc.gridx = 0;
+            label = new JLabel("XYZ");
+            slidersContainer.add(label, gbc);
+            gbc.gridx++;
+            slidersContainer.add(sliderXYZ, gbc);
+            gbc.gridx++;
+            slidersContainer.add(valueXYZLabel, gbc);
+
+            // Additional row for a new Vector
+            gbc.gridy++;
+
+            panel.add(slidersContainer);
+
+
+            //panel.setPreferredSize(new Dimension(panelWidth, 400));
+            panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            panel.setBorder(BorderFactory.createTitledBorder("Material"));
         }
 
         return panel;

@@ -2,18 +2,17 @@ package com.michal.debski;
 
 import com.michal.debski.loader.Loader;
 import com.michal.debski.loader.mdMesh;
-import com.michal.debski.utilities.Color;
+import com.michal.debski.utilities.Colour;
 import com.michal.debski.utilities.Transform;
 import org.joml.Matrix4f;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyListener;
 
 
 public class Model extends Loader implements Panel
 {
-    private Color color = new Color(1.f);
+    private Colour color = new Colour(1.f);
     private String name;
     private Matrix4f matrixModel;
 
@@ -37,12 +36,12 @@ public class Model extends Loader implements Panel
         Containers.AddPanelContainer(this);
     }
 
-    public void setColor(Color color)
+    public void setColor(Colour color)
     {
         this.color = color;
     }
 
-    public Color getColor()
+    public Colour getColor()
     {
         return color;
     }
@@ -88,7 +87,6 @@ public class Model extends Loader implements Panel
         meshInfoPanel.setLayout(new GridBagLayout());
         meshInfoPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         meshInfoPanel.setBorder(BorderFactory.createTitledBorder("Mesh information"));
-
 
 
         int verticesCount = 0;
