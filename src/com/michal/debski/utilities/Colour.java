@@ -49,16 +49,13 @@ public class Colour implements Panel
             g = (float)newColor.getGreen() / 255.f;
             b = (float)newColor.getBlue() / 255.f;
         });
+
+        // Remove preview panel
         jcc.setPreviewPanel(new JPanel());
-        //jcc.setMaximumSize(new Dimension(300, 200));
 
-        JPanel p = (JPanel)jcc.getChooserPanels()[3];
-        p.remove(1);
+        
+        System.out.println(jcc.getChooserPanels()[3].getDisplayName());
 
-        JPanel p2 = (JPanel) p.getComponent(0);
-        // Remove 9 components(sliders and their lables...)
-        for(int i = 0; i < 9; i++)
-            p2.remove(0);
         AbstractColorChooserPanel[] panels = jcc.getChooserPanels();
         for(AbstractColorChooserPanel accp : panels)
         {
@@ -66,7 +63,14 @@ public class Colour implements Panel
             {
                 jcc.removeChooserPanel(accp);
             }
-            //accp.setAlignmentX(Component.LEFT_ALIGNMENT);
+            else
+            {
+                accp.remove(1);
+                JPanel p2 = (JPanel) accp.getComponent(0);
+                // Remove 9 components(sliders and their lables...)
+                for(int i = 0; i < 9; i++)
+                    p2.remove(0);
+            }
         }
 
         panel.add(jcc);
