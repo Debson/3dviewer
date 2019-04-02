@@ -52,9 +52,7 @@ public class Colour implements Panel
 
         // Remove preview panel
         jcc.setPreviewPanel(new JPanel());
-
         
-        System.out.println(jcc.getChooserPanels()[3].getDisplayName());
 
         AbstractColorChooserPanel[] panels = jcc.getChooserPanels();
         for(AbstractColorChooserPanel accp : panels)
