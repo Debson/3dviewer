@@ -1,7 +1,7 @@
 # Folder names to ignore
 out/
 .idea/
-assets/
+#assets/
 libs/
 
 # File Extensions to ignore
