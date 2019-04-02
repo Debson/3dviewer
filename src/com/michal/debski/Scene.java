@@ -59,7 +59,6 @@ public class Scene implements GameHandlerInterface, SceneInterface
         gui = new Gui();
 
         gui.createGui(Containers.panelContainer);
-
     }
 
     @Override

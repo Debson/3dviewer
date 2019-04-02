@@ -1,5 +1,7 @@
 package com.michal.debski;
 
+import com.michal.debski.utilities.FpsCounter;
+
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
@@ -8,6 +10,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 import java.util.ArrayList;
+import java.util.concurrent.Flow;
 
 
 public class Gui extends JFrame
@@ -19,6 +22,7 @@ public class Gui extends JFrame
     private JPanel mainPanel = new JPanel();
 
     JPanel indexPanelContainer = new JPanel();
+    private JPanel fpsPanel = new JPanel();
     private JPanel loadedModelsPanel = new JPanel();
     private JPanel primitivesPanel = new JPanel();
     private JPanel settingsPanel = new JPanel();
@@ -56,8 +60,18 @@ public class Gui extends JFrame
         mainPanel.setPreferredSize(new Dimension(width - 10, Core.windowProperties.getHeight() - 10));
         mainPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
+
         // Set up indexPanelContainer(contains three categories, models, primitives and settings)
         indexPanelContainer.setLayout(new BoxLayout(indexPanelContainer, BoxLayout.Y_AXIS));
+
+        fpsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JLabel fpsLabel = new JLabel("FPS: 60.00", JLabel.CENTER);
+        fpsLabel.setBorder(BorderFactory.createEtchedBorder(Color.red, Color.black));
+        fpsLabel.setPreferredSize(new Dimension(120, 30));
+        fpsPanel.add(fpsLabel);
+        fpsPanel.setMaximumSize(new Dimension(width, 40));
+
+        FpsCounter.SetFpsLabel(fpsLabel);
 
         loadedModelsPanel.setLayout(new BoxLayout(loadedModelsPanel, BoxLayout.Y_AXIS));
         loadedModelsPanel.setBorder(BorderFactory.createTitledBorder("Models"));
@@ -68,6 +82,7 @@ public class Gui extends JFrame
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
         settingsPanel.setBorder(BorderFactory.createTitledBorder("Settings"));
 
+        indexPanelContainer.add(fpsPanel);
         indexPanelContainer.add(loadedModelsPanel);
         indexPanelContainer.add(settingsPanel);
 
@@ -113,7 +128,7 @@ public class Gui extends JFrame
 
         // Set cross platform feel and look for the Java Swing
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {
@@ -182,9 +197,9 @@ public class Gui extends JFrame
             }
             else if(panelEntity.isPrimitive())
             {
-                if(indexPanelContainer.getComponentCount() < 3)
+                if(indexPanelContainer.getComponentCount() < 4)
                 {
-                    indexPanelContainer.add(primitivesPanel, 1);
+                    indexPanelContainer.add(primitivesPanel, 2);
                 }
                 if (primitivesPanel.getComponentCount() > 0)
                     primitivesPanel.add(Box.createRigidArea(new Dimension(0, 15)), Component.LEFT_ALIGNMENT);
@@ -242,7 +257,7 @@ public class Gui extends JFrame
             panelEntity.getPanel().add(buttonPanel, 0);
 
             panelEntity.getPanel().setAutoscrolls(true);
-            validate();
+            revalidate();
             repaint();
         }
     }
