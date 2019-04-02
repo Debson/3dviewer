@@ -1,41 +1,26 @@
 package com.michal.debski.loader;
 
-import com.michal.debski.Shader;
 import com.michal.debski.ShaderManager;
 import org.joml.Vector3i;
 import org.lwjgl.system.MemoryUtil;
 
-import java.nio.BufferOverflowException;
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.*;
+import java.util.*;
 
 import static com.michal.debski.loader.Loader.*;
-import static org.lwjgl.opengl.GL11C.GL_FLOAT;
-import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11C.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11C.glBindTexture;
-import static org.lwjgl.opengl.GL11C.glDrawArrays;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13C.glActiveTexture;
-import static org.lwjgl.opengl.GL15C.*;
-import static org.lwjgl.opengl.GL15C.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL20C.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20C.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30C.glBindVertexArray;
-import static org.lwjgl.opengl.GL30C.glGenVertexArrays;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.memFree;
 
 public class mdMesh
 {
-    public String name = "";
-    public List<Loader.mdVertex> vertices = new ArrayList<Loader.mdVertex>();
-    public List<Vector3i> indices      = new ArrayList<Vector3i>();
-    public List<Loader.mdTexture> textures = new ArrayList<>();
-    public String material_name = "";
-    public mdMaterial material = new mdMaterial(1.f);
+    public String name                      = "";
+    public List<Loader.mdVertex> vertices   = new ArrayList<Loader.mdVertex>();
+    public List<Vector3i> indices           = new ArrayList<Vector3i>();
+    public List<Loader.mdTexture> textures  = new ArrayList<>();
+    public String material_name             = "";
+    public mdMaterial material              = new mdMaterial(1.f);
 
-    private int vao, vbo, ebo;
+    public int vao, vbo;
     public boolean hasVertices = false;
     public boolean hasTexCoods = false;
     public boolean hasNormals = false;
@@ -60,7 +45,6 @@ public class mdMesh
         this.material       = other.material;
         this.vao = other.vao;
         this.vbo = other.vbo;
-        this.ebo = other.ebo;
     }
 
     public void setupMesh()

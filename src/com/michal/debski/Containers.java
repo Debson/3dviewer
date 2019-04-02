@@ -8,14 +8,5 @@ public class Containers
 {
     public static ArrayList<Panel> panelContainer = new ArrayList<>();
 
-
-    public static void AddPanelContainer(Panel panelEntity)
-    {
-        panelContainer.add(panelEntity);
-    }
-
-    public static ArrayList<Panel> GetPanelContainer(ArrayList<Panel> panelEntityContainer)
-    {
-        return panelEntityContainer;
-    }
+    public static ArrayList<Model> modelContainer = new ArrayList<>();
 }

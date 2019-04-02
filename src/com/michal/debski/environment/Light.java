@@ -28,7 +28,7 @@ public class Light extends Model
     private float orbitingSpeed = 2.f;
 
     private boolean renderLightCube = true;
-    private boolean castShadows = true;
+    private static boolean castShadows = true;
     private Shadows shadows = null;
     private mdTimer orbitingTimer = new mdTimer();
 
@@ -126,18 +126,35 @@ public class Light extends Model
 
     public void renderSceneWithShadows(SceneInterface scene)
     {
-        Shader tempShader = ShaderManager.GetShader();
-        shadows.fillDepthMap(scene);
-
-        ShaderManager.SetShader(tempShader);
-
-        // Render scene as normal
         ShaderManager.GetShader().use();
-        ShaderManager.GetShader().setInt("shadows.depthMap", 6);
-        ShaderManager.GetShader().setMat4("lightSpaceMatrix", shadows.getLightSpaceMatrix());
-        //ShaderManager.GetShader().setBool("shadows.switchedOn", true);
-        glActiveTexture(shadows.shaderTextureNum);
-        glBindTexture(GL_TEXTURE_2D, shadows.getDepthMap());
+        ShaderManager.GetShader().setBool("shadowsActive", castShadows);
+        ShaderManager.GetShader().setBool("lightActive", lightActive);
+
+        if(castShadows)
+        {
+            Shader tempShader = ShaderManager.GetShader();
+            shadows.fillDepthMap(scene);
+
+            ShaderManager.SetShader(tempShader);
+
+            // Render scene as normal
+
+            ShaderManager.GetShader().setInt("shadows.depthMap", 6);
+            ShaderManager.GetShader().setMat4("lightSpaceMatrix", shadows.getLightSpaceMatrix());
+            //ShaderManager.GetShader().setBool("shadows.switchedOn", true);
+            glActiveTexture(shadows.shaderTextureNum);
+            glBindTexture(GL_TEXTURE_2D, shadows.getDepthMap());
+        }
+    }
+
+    public static void CastShadows(boolean cs)
+    {
+        castShadows = cs;
+    }
+
+    public static boolean ShadowsEnabled()
+    {
+        return castShadows;
     }
 
     @Override
@@ -150,51 +167,46 @@ public class Light extends Model
         // Get panel with transform settings
         JPanel transformPanel = getTransform().createPanelEntity().getPanel();
 
-        // Change scale label to "Intensity"
-        /*JLabel scaleLabel = (JLabel) transformPanel.getComponent(6);
-        scaleLabel.setText("Intensity");*/
-
-                //settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
         JPanel orbitingPanel = new JPanel();
-        orbitingPanel.setLayout(new BoxLayout(orbitingPanel, BoxLayout.Y_AXIS));
+        orbitingPanel.setLayout(new GridBagLayout());
 
 
-        JLabel label = new JLabel("Orbiting Radius");
-        label.setAlignmentX(Component.LEFT_ALIGNMENT);
-        orbitingPanel.add(label);
+        JPanel environmentPanel = new JPanel();
+        environmentPanel.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.weightx = 0.1;
+        gbc.insets = new Insets(2,2,5,2);
+
+
+        JLabel radiusLabel = new JLabel(String.format("%-2.2f", orbitingRadius));
+        radiusLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+        radiusLabel.setPreferredSize(new Dimension(20, 20));
+
 
         int sliderWidth = 200;
         int sliderHeight = 50;
-        JSlider radiusSlider = new JSlider(JSlider.HORIZONTAL, 0, 50, (int)orbitingRadius);
+        JSlider radiusSlider = new JSlider(JSlider.HORIZONTAL, 1, 50, (int)orbitingRadius);
         radiusSlider.addChangeListener(e -> {
             orbitingRadius = radiusSlider.getValue();
+            radiusLabel.setText(String.format("%-2.2f", orbitingRadius));
         });
-        radiusSlider.setMajorTickSpacing(10);
-        radiusSlider.setPaintTicks(true);
-        radiusSlider.setPaintLabels(true);
-        radiusSlider.setMaximumSize(new Dimension(sliderWidth, sliderHeight));
-        radiusSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        orbitingPanel.add(radiusSlider);
 
-        label = new JLabel("Orbiting Speed");
-        label.setAlignmentX(Component.LEFT_ALIGNMENT);
-        orbitingPanel.add(label);
+        JLabel speedLabel = new JLabel(String.format("%-2.2f", orbitingSpeed));
+        speedLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+        speedLabel.setPreferredSize(new Dimension(20, 20));
 
         JSlider speedSlider = new JSlider(JSlider.HORIZONTAL, 0, 50, (int)orbitingSpeed * 10);
         speedSlider.addChangeListener(e -> {
             orbitingSpeed = (float)speedSlider.getValue() / 10.f;
+            speedLabel.setText(String.format("%-2.2f", orbitingSpeed));
         });
-        speedSlider.setMajorTickSpacing(10);
-        speedSlider.setPaintTicks(true);
-        speedSlider.setPaintLabels(true);
-        speedSlider.setMaximumSize(new Dimension(sliderWidth, sliderHeight));
-        speedSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        orbitingPanel.add(speedSlider);
 
 
-        JCheckBox orbitingCheckBox = new JCheckBox("Is orbiting: ");
+        JCheckBox orbitingCheckBox = new JCheckBox("Is orbiting");
         orbitingCheckBox.setSelected(this.orbiting);
         PanelUtility.SetPanelEnabled(transformPanel, !this.orbiting);
         radiusSlider.setEnabled(this.orbiting);
@@ -214,7 +226,68 @@ public class Light extends Model
             }
         });
 
-        orbitingPanel.add(orbitingCheckBox);
+
+        JLabel label = new JLabel("Orbiting radius", JLabel.CENTER);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        orbitingPanel.add(label, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        label = new JLabel("Value");
+        orbitingPanel.add(label, gbc);
+        gbc.gridx++;
+        orbitingPanel.add(radiusSlider, gbc);
+        gbc.gridx++;
+        orbitingPanel.add(radiusLabel, gbc);
+        gbc.gridx = 1;
+        gbc.gridy++;
+        label = new JLabel("Orbiting speed", JLabel.CENTER);
+        orbitingPanel.add(label, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        label = new JLabel("Value");
+        orbitingPanel.add(label, gbc);
+        gbc.gridx++;
+        orbitingPanel.add(speedSlider, gbc);
+        gbc.gridx++;
+        orbitingPanel.add(speedLabel, gbc);
+        gbc.gridwidth = 2;
+        gbc.gridx = 0;
+        gbc.gridy++;
+        orbitingPanel.add(orbitingCheckBox, gbc);
+
+        orbitingPanel.setMaximumSize(new Dimension(Gui.GetWidth(), 160));
+        orbitingPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        orbitingPanel.setBorder(BorderFactory.createTitledBorder("Orbiting"));
+
+        gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.weightx = 0.1;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(2,2,5,2);
+        //gbc.gridwidth = 2;
+        JCheckBox shadowsCheckBox = new JCheckBox("Cast Shadows");
+        shadowsCheckBox.setSelected(this.castShadows);
+        shadowsCheckBox.addItemListener(e -> {
+            castShadows = shadowsCheckBox.isSelected();
+        });
+
+        JCheckBox lightCheckBox = new JCheckBox("Cast Lights");
+        lightCheckBox.setSelected(this.lightActive);
+        lightCheckBox.addItemListener(e -> {
+            lightActive = lightCheckBox.isSelected();
+            shadowsCheckBox.setSelected(lightCheckBox.isSelected() && castShadows);
+        });
+
+
+        environmentPanel.add(shadowsCheckBox, gbc);
+        gbc.gridy++;
+        environmentPanel.add(lightCheckBox, gbc);
+
+        environmentPanel.setMaximumSize(new Dimension(Gui.GetWidth(), 100));
+        environmentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        environmentPanel.setBorder(BorderFactory.createTitledBorder("Environment"));
 
         // Create color picker panel
         JPanel colorPanel = getColor().createPanelEntity().getPanel();
@@ -222,8 +295,9 @@ public class Light extends Model
         panel.add(transformPanel);
         panel.add(colorPanel);
         panel.add(orbitingPanel);
+        panel.add(environmentPanel);
 
 
-        return new PanelEntity(panel, panelName);
+        return new PanelEntity(panel, panelName, false, false);
     }
 }

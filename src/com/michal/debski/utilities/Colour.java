@@ -1,5 +1,6 @@
 package com.michal.debski.utilities;
 
+import com.michal.debski.Gui;
 import com.michal.debski.Panel;
 import com.michal.debski.PanelEntity;
 
@@ -71,7 +72,8 @@ public class Colour implements Panel
         panel.add(jcc);
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setBorder(BorderFactory.createTitledBorder("Colour"));
+        panel.setMaximumSize(new Dimension(Gui.GetWidth(), panel.getPreferredSize().height));
 
-        return new PanelEntity(panel, "ColorPicker");
+        return new PanelEntity(panel, "ColorPicker", false, false);
     }
 }

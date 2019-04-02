@@ -2,18 +2,11 @@ package com.michal.debski.loader;
 
 import com.michal.debski.Vertices;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
+import org.joml.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
-
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
+import static org.lwjgl.opengl.GL30.*;
 
 
 public class Loader
@@ -72,7 +65,6 @@ public class Loader
         String path;
     }
 
-
     public Vector<mdMesh> meshes = new Vector<mdMesh>();
     private String mtlFilePath = new String();
     private String directory = new String();
@@ -87,15 +79,17 @@ public class Loader
         List<Float> allNormals = new ArrayList<Float>();
 
         int extPos = path.lastIndexOf('.');
-        if(path.substring(extPos, path.length()).contains("obj") == false)
+        String fullName = path.substring(extPos);
+        fullName = fullName.toLowerCase();
+        if(fullName.contains("obj") == false)
         {
             System.out.println("ERROR: File not supported. Only files with \".obj\" extension are supported.");
             return;
         }
 
-        int dirDelimiter = path.lastIndexOf('\\');
+        int dirDelimiter = path.lastIndexOf('/');
         directory = path.substring(0, dirDelimiter);
-        directory += '\\';
+        directory += '/';
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
@@ -150,25 +144,46 @@ public class Loader
                         }
                         break;
                     }
+                    case GROUP: {
+                        // Get name of the object
+                        for(int i = 1; i < values.length; i++) {
+                            // Add divisor '_' if mesh name has more than one word separated by space(shouldn't happen)
+                            if(i % 2 == 0)
+                                mesh.name += "_";
+                            mesh.name += values[i];
+                        }
+                        break;
+                    }
                     case FACE: {
                         for(int i = 1; i < values.length; i++)
                         {
                             String[] temp = values[i].split("/");
+
                             // Save indices as a three-dimensional vector
                             // Consider that there may not be texture coordinates or normals
                             // From parsed value subtract 1, because indices in OpenGL starts at 0
-                            if(temp.length == 1) {
+                            if(temp.length == 1)
+                            {
                                 mesh.indices.add(new Vector3i(
                                         Integer.parseInt(temp[0]) - 1,
                                         0,
                                         0));
-                            } else if(temp.length == 2)
+                            }
+                            else if(temp.length == 2)
                             {
                                 mesh.indices.add(new Vector3i(
                                         Integer.parseInt(temp[0]) - 1,
                                         Integer.parseInt(temp[1]) - 1,
                                         0));
-                            } else
+                            }
+                            else if(allTexCoords.isEmpty())
+                            {
+                                mesh.indices.add(new Vector3i(
+                                        Integer.parseInt(temp[0]) - 1,
+                                        0,
+                                        Integer.parseInt(temp[2]) - 1));
+                            }
+                            else
                             {
                                 mesh.indices.add(new Vector3i(
                                         Integer.parseInt(temp[0]) - 1,
@@ -211,6 +226,9 @@ public class Loader
                             // Find mesh that uses material with that name
                             mdMesh mesh = findMeshByMaterialName(values[1]);
 
+
+                            if(mesh == null)
+                                break;
 
                             // Find maps and their paths
                             while ((line = br.readLine()) != null && !line.contains(MTL_MATERIAL_BIND)) {
@@ -366,7 +384,7 @@ public class Loader
     {
         for(mdMesh mesh : meshes)
         {
-            if(mesh.material_name.equals(matName))
+            if(mesh.material_name.contains(matName))
                 return mesh;
         }
 
@@ -396,5 +414,21 @@ public class Loader
         }
 
         return verticesList;
+    }
+
+    // Free GPU memory
+    public void free()
+    {
+        for(mdMesh mesh : meshes)
+        {
+            for(mdTexture tex : mesh.textures)
+            {
+                glDeleteTextures(tex.id);
+            }
+            mesh.textures.clear();
+
+            /*glDeleteBuffers(mesh.vbo);
+            glDeleteVertexArrays(mesh.vao);*/
+        }
     }
 }

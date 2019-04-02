@@ -1,9 +1,9 @@
 package com.michal.debski.utilities;
 
+import com.michal.debski.Gui;
 import com.michal.debski.Panel;
 import com.michal.debski.PanelEntity;
 import org.joml.Vector3f;
-import org.joml.Vector3i;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,7 +57,7 @@ public class Transform implements Panel
         GridBagConstraints gbc = new GridBagConstraints();
 
 
-        JLabel posXLabel = new JLabel(Float.toString(position.x));
+        JLabel posXLabel = new JLabel(Float.toString(position.x), JLabel.CENTER);
         posXLabel.setBorder(BorderFactory.createLineBorder(Color.black));
         posXLabel.setPreferredSize(new Dimension(40, 20));
 
@@ -67,7 +67,7 @@ public class Transform implements Panel
             posXLabel.setText(String.format("%-2.2f", position.x));
         });
 
-        JLabel posYLabel = new JLabel(Float.toString(position.y));
+        JLabel posYLabel = new JLabel(Float.toString(position.y), JLabel.CENTER);
         posYLabel.setBorder(BorderFactory.createLineBorder(Color.black));
         posYLabel.setPreferredSize(new Dimension(20, 20));
 
@@ -78,7 +78,7 @@ public class Transform implements Panel
         });
 
 
-        JLabel posZLabel = new JLabel(Float.toString(position.z));
+        JLabel posZLabel = new JLabel(Float.toString(position.z), JLabel.CENTER);
         posZLabel.setBorder(BorderFactory.createLineBorder(Color.black));
 
         posZLabel.setPreferredSize(new Dimension(20, 20));
@@ -90,7 +90,7 @@ public class Transform implements Panel
         });
 
 
-        JLabel scaleLabel = new JLabel(Float.toString(position.z));
+        JLabel scaleLabel = new JLabel(Float.toString(position.z), JLabel.CENTER);
         scaleLabel.setBorder(BorderFactory.createLineBorder(Color.black));
         scaleLabel.setPreferredSize(new Dimension(20, 20));
 
@@ -101,9 +101,8 @@ public class Transform implements Panel
         });
 
 
-
         JLabel label = new JLabel("X");
-        gbc.fill = GridBagConstraints.BOTH;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -113,7 +112,7 @@ public class Transform implements Panel
         slidersContainer.add(label, gbc);
         gbc.gridx++;
         slidersContainer.add(posXSlider, gbc);
-        gbc.gridx++;
+        gbc.gridx++;;
         slidersContainer.add(posXLabel, gbc);
         gbc.gridx = 0;
         gbc.gridy++;
@@ -144,10 +143,11 @@ public class Transform implements Panel
         slidersContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(slidersContainer);
 
-        //panel.setPreferredSize(new Dimension(200, 140));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setBorder(BorderFactory.createTitledBorder("Position"));
+        panel.setMaximumSize(new Dimension(Gui.GetWidth(), panel.getPreferredSize().height));
 
-        return new PanelEntity(panel, "Transform");
+
+        return new PanelEntity(panel, "Transform", false, false);
     }
 }

@@ -1,6 +1,7 @@
 package com.michal.debski;
 
 import com.michal.debski.environment.DirectionalLight;
+import com.michal.debski.environment.Light;
 import com.michal.debski.loader.Loader;
 import com.michal.debski.utilities.Colour;
 
@@ -19,14 +20,10 @@ public class Scene implements GameHandlerInterface, SceneInterface
     private Gui gui;
 
 
-
-
     @Override
     public void OnWindowOpen()
     {
-        System.out.println("Opened!");
-
-        shader = new Shader("shaders\\default.vert", "shaders\\default.frag");
+        shader = new Shader("shaders/default.vert", "shaders/default.frag");
 
 
         camera = new Camera(new Vector2f(
@@ -36,12 +33,13 @@ public class Scene implements GameHandlerInterface, SceneInterface
 
 
         // Remember to use "\\" directory delimiter! Otherwise there will be an error.
-        String path = "assets\\cube.obj";
-        String path2 = "assets\\nanosuit\\nanosuit.obj";
-        String path3 = "assets\\teapot.obj";
-        String path4 = "assets\\head.obj";
+        String path = "assets/teapot.obj";
+        String path2 = "assets/nanosuit/nanosuit.obj";
+        String path3 = "assets/teddybear.obj";
+        String path4 = "assets/head.obj";
+        String path5 = "assets/wolf.obj";
 
-        myModel = new Model(path4);
+        myModel = new Model(path2);
         myModel.getTransform().setPosition(new Vector3f(0.f, 0.f, 0.f));
         myModel.getTransform().setScale(new Vector3f(1.f));
         //myModel.setColor(new Colour(1.f, 0.5f, 1.f));
@@ -52,14 +50,10 @@ public class Scene implements GameHandlerInterface, SceneInterface
         //cube.setScale(new Vector3f(50.f, 1.f, 50.f));
         cube.getTransform().setPosition(new Vector3f(0.f, 1.f, 10.f));
 
-        //camera.lockCameraAt(myModel.getPosition(), true);
+        //camera.lockCameraAt(myModel.getTransform().getPosition(), true);
 
         dirLight = new DirectionalLight(new Vector3f( -20.f, 30.f, -30.f), new Colour( 1.f));
         dirLight.getTransform().setScale(new Vector3f(3.f));
-        /*dirLight.setOribitng(true);
-        dirLight.setOrbitingRadius(0.5f);
-        dirLight.setOrbitingSpeed(0.5f);*/
-        //dirLight.setOrbitingAroundPosition(myModel.getTransform().getPosition(), 50.0f, 2.5f,true);
 
 
         gui = new Gui();
@@ -71,7 +65,8 @@ public class Scene implements GameHandlerInterface, SceneInterface
     @Override
     public void OnWindowClose()
     {
-        gui.dispose();
+        if(gui != null)
+            gui.dispose();
     }
 
     @Override
@@ -103,7 +98,7 @@ public class Scene implements GameHandlerInterface, SceneInterface
         // Render scene to depth map
         dirLight.renderSceneWithShadows(this);
         // Render light box and set light uniforms
-        dirLight.Render(camera.position);
+        dirLight.Render(camera.transform.getPosition());
         // Render scene as normal
         renderScene(shader);
 
@@ -114,7 +109,7 @@ public class Scene implements GameHandlerInterface, SceneInterface
     {
         myModel = null;
         myModel = new Model(pathOfDroppedFile);
-        gui.replaceModel("Nanosuit", myModel);
+        gui.replaceModel();
     }
 
     @Override

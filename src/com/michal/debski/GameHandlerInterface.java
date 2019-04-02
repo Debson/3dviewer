@@ -5,7 +5,11 @@ public interface GameHandlerInterface
     class WindowProperties
     {
         public static int width, height;
+        public static int winPosX, winPosY;
         public static int posX, posY;
+
+        public static int[] resolutionWidth = {1280, 1024, 800, 640};
+        public static int[] resolutionHeight = {720, 768, 600, 480};
 
         WindowProperties(int width, int height)
         {

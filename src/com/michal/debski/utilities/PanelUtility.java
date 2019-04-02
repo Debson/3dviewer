@@ -42,7 +42,7 @@ public class PanelUtility
             Vector3f vector = vectorList[i];
 
             // X
-            JLabel valueXLabel = new JLabel(String.format("%-2.2f", vector.x));
+            JLabel valueXLabel = new JLabel(String.format("%-2.2f", vector.x), JLabel.CENTER);
             valueXLabel.setBorder(BorderFactory.createLineBorder(Color.black));
             valueXLabel.setPreferredSize(new Dimension(40, 20));
 
@@ -52,7 +52,7 @@ public class PanelUtility
                 valueXLabel.setText(String.format("%-2.2f", vector.x));
             });
 
-            JLabel valueYLabel = new JLabel(String.format("%-2.2f", vector.x));
+            JLabel valueYLabel = new JLabel(String.format("%-2.2f", vector.x), JLabel.CENTER);
             valueYLabel.setBorder(BorderFactory.createLineBorder(Color.black));
             valueYLabel.setPreferredSize(new Dimension(40, 20));
 
@@ -66,7 +66,7 @@ public class PanelUtility
 
 
             // Z
-            JLabel valueZLabel = new JLabel(String.format("%-2.2f", vector.x));
+            JLabel valueZLabel = new JLabel(String.format("%-2.2f", vector.x), JLabel.CENTER);
             valueZLabel.setBorder(BorderFactory.createLineBorder(Color.black));
             valueZLabel.setPreferredSize(new Dimension(40, 20));
 
@@ -78,7 +78,7 @@ public class PanelUtility
 
 
             // XYZ
-            JLabel valueXYZLabel = new JLabel(String.format("%-2.2f", vector.x));
+            JLabel valueXYZLabel = new JLabel(String.format("%-2.2f", vector.x), JLabel.CENTER);
             valueXYZLabel.setBorder(BorderFactory.createLineBorder(Color.black));
             valueXYZLabel.setPreferredSize(new Dimension(40, 20));
 
@@ -154,6 +154,43 @@ public class PanelUtility
             panel.setAlignmentX(Component.LEFT_ALIGNMENT);
             panel.setBorder(BorderFactory.createTitledBorder("Material"));
         }
+
+        return panel;
+    }
+
+    public static JPanel CreateSliderFloat(String labelName, float[] value, float min, float max)
+    {
+        int multiplier = 50;
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        JLabel label = new JLabel(labelName);
+
+        JLabel valueLabel = new JLabel(String.format("%-2.2f", value[0]));
+        valueLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+        valueLabel.setPreferredSize(new Dimension(40, 20));
+
+        JSlider slider = new JSlider(JSlider.HORIZONTAL, (int)(min * multiplier), (int)(max * multiplier), (int)(value[0] * multiplier));
+        slider.addChangeListener(e ->{
+            value[0] = (float)slider.getValue() / (float)multiplier;
+            valueLabel.setText(String.format("%-2.2f", value[0]));
+        });
+
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(2, 2, 2, 2);
+        gbc.gridx = 0;
+
+        panel.add(label, gbc);
+        gbc.gridx++;
+        panel.add(slider, gbc);
+        gbc.gridx++;
+        panel.add(valueLabel, gbc);
+
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         return panel;
     }

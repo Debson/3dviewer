@@ -1,14 +1,11 @@
 package com.michal.debski.loader;
 
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12C.GL_CLAMP_TO_EDGE;
-import static org.lwjgl.opengl.GL30C.glGenerateMipmap;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.stb.STBImage.*;
 
 
@@ -38,11 +35,11 @@ public class Image
             nrComponents = components.get();
             int format = 0;
             if(nrComponents == 1)
-                format = GL11.GL_RED;
+                format = GL_RED;
             else if(nrComponents == 3)
-                format = GL11.GL_RGB;
+                format = GL_RGB;
             else if(nrComponents == 4)
-                format = GL11.GL_RGBA;
+                format = GL_RGBA;
 
             textureID = glGenTextures();
             glBindTexture(GL_TEXTURE_2D, textureID);

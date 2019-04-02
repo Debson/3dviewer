@@ -1,12 +1,17 @@
 package com.michal.debski;
 
+import com.michal.debski.utilities.Transform;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-public class Camera
+import javax.swing.*;
+import javax.swing.border.Border;
+import java.awt.*;
+
+public class Camera implements Panel
 {
-        enum CameraMovement
+    enum CameraMovement
         {
             Forward,
             Backward,
@@ -14,7 +19,8 @@ public class Camera
             Right
         };
 
-        public Vector3f position = new Vector3f();
+        public Transform transform = new Transform();
+        private Vector3f prevPosition = new Vector3f();
         public Vector3f front = new Vector3f();
         public Vector3f up = new Vector3f();
         public Vector3f right = new Vector3f();
@@ -41,6 +47,12 @@ public class Camera
         private float SENSITIVITY   = 0.1f;
         private float ZOOM		    = 45.f;
 
+        JLabel posXLabel = new JLabel();
+        JLabel posYLabel = new JLabel();
+        JLabel posZLabel = new JLabel();
+        JLabel yawLabel = new JLabel();
+        JLabel pitchLabel = new JLabel();
+
         public Camera(Vector2f screenRes, Vector3f position)
         {
             this.screenRes = screenRes;
@@ -50,27 +62,44 @@ public class Camera
             this.zoom = ZOOM;
 
             this.up = new Vector3f(0.f, 1.f, 0.f);
-            this.position = position;
+            this.transform.setPosition(position);
             this.worldUp = up;
             this.yaw = YAW;
             this.pitch = PITCH;
+
+
+
             updateCameraVectors();
+
+            Containers.panelContainer.add(this);
         }
 
         public Matrix4f getViewMatrix()
         {
             Vector3f pos = new Vector3f();
-            position.add(front, pos);
+            transform.getPosition().add(front, pos);
+            //position.add(front, pos);
             if(cameraLocked)
             {
-                position = new Vector3f((float)Math.sin(Time.GetTicks()) * cameraLockedXZFactor,
-                                            cameraLockedYFactor,
-                                        (float)Math.cos(Time.GetTicks()) * cameraLockedXZFactor);
-                position.add(front, pos);
-                view = new Matrix4f().lookAt(position, positionToLookAt, up);
+                transform.setPosition(new Vector3f((float)Math.sin(Time.GetTicks()) * cameraLockedXZFactor,
+                                            15.f,
+                                        (float)Math.cos(Time.GetTicks()) * cameraLockedXZFactor));
+                transform.getPosition().y = cameraLockedYFactor;
+                transform.getPosition().add(front, pos);
+                view = new Matrix4f().lookAt(transform.getPosition(), positionToLookAt, up);
             }
             else
-                view = new Matrix4f().lookAt(position, pos, up);
+                view = new Matrix4f().lookAt(transform.getPosition(), pos, up);
+
+
+            // Update labels
+            if(prevPosition.equals(transform.getPosition()) == false)
+            {
+                prevPosition = new Vector3f(transform.getPosition());
+                posXLabel.setText(String.format("%-2.2f", transform.getPosition().x));
+                posYLabel.setText(String.format("%-2.2f", transform.getPosition().y));
+                posZLabel.setText(String.format("%-2.2f", transform.getPosition().z));
+            }
 
             return view;
         }
@@ -102,7 +131,7 @@ public class Camera
                     else
                     {
                         front.mul(velocity, pos);
-                        position.add(pos);
+                        transform.getPosition().add(pos);
                     }
                     break;
                 }
@@ -114,18 +143,30 @@ public class Camera
                     else
                     {
                         front.mul(velocity, pos);
-                        position.sub(pos);
+                        transform.getPosition().sub(pos);
                     }
                     break;
                 }
                 case Left: {
-                    right.mul(velocity, pos);
-                    position.sub(pos);
+                    if(cameraLocked)
+                    {
+                        cameraLockedXZFactor += velocity;
+                    }
+                    else {
+                        right.mul(velocity, pos);
+                        transform.getPosition().sub(pos);
+                    }
                     break;
                 }
                 case Right: {
-                    right.mul(velocity, pos);
-                    position.add(pos);
+                    if(cameraLocked)
+                    {
+                        cameraLockedXZFactor -= velocity;
+                    }
+                    else {
+                        right.mul(velocity, pos);
+                        transform.getPosition().add(pos);
+                    }
                     break;
                 }
             }
@@ -150,6 +191,9 @@ public class Camera
                 if (pitch < -89.f)
                     pitch = -89.f;
 
+                yawLabel.setText(String.format("%-2.2f", yaw));
+                pitchLabel.setText(String.format("%-2.2f", pitch));
+
                 updateCameraVectors();
             }
         }
@@ -173,5 +217,101 @@ public class Camera
             right = r;
             right.cross(front, u).normalize();
             up = u;
+
         }
+
+    @Override
+    public PanelEntity createPanelEntity()
+    {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        JPanel transformPanel = new JPanel();
+        transformPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.weightx = 0.1;
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.insets = new Insets(0, 0, 5, 15);
+        posXLabel = new JLabel(String.format("%-2.2f", transform.getPosition().x), JLabel.CENTER);
+        posXLabel.setPreferredSize(new Dimension(40, 20));
+        posXLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        posYLabel = new JLabel(String.format("%-2.2f", transform.getPosition().y), JLabel.CENTER);
+        posYLabel.setPreferredSize(new Dimension(40, 20));
+        posYLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        posZLabel = new JLabel(String.format("%-2.2f", transform.getPosition().z), JLabel.CENTER);
+        posZLabel.setPreferredSize(new Dimension(40, 20));
+        posZLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        yawLabel = new JLabel(String.format("%-2.2f", yaw), JLabel.CENTER);
+        yawLabel.setPreferredSize(new Dimension(40, 20));
+        yawLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        pitchLabel = new JLabel(String.format("%-2.2f", pitch), JLabel.CENTER);
+        pitchLabel.setPreferredSize(new Dimension(40, 20));
+        pitchLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        JLabel label = new JLabel("X");
+        gbc.weightx = 0;
+        transformPanel.add(label, gbc);
+        gbc.weightx = 0.1;
+        gbc.gridx++;
+        transformPanel.add(posXLabel, gbc);
+        gbc.gridx++;
+        label = new JLabel("Y");
+        gbc.weightx = 0;
+        transformPanel.add(label, gbc);
+        gbc.weightx = 0.1;
+        gbc.gridx++;
+        transformPanel.add(posYLabel, gbc);
+        gbc.gridx++;
+        label = new JLabel("Z");
+        gbc.weightx = 0;
+        transformPanel.add(label, gbc);
+        gbc.weightx = 0.1;
+        gbc.gridx++;
+        transformPanel.add(posZLabel, gbc);
+        gbc.gridy++;
+        gbc.gridx = 0;
+        label = new JLabel("Yaw");
+        transformPanel.add(label, gbc);
+        gbc.gridx++;
+        transformPanel.add(yawLabel, gbc);
+        gbc.gridy++;
+        gbc.gridx = 0;
+        label = new JLabel("Pitch");
+        transformPanel.add(label, gbc);
+        gbc.gridx++;
+        transformPanel.add(pitchLabel, gbc);
+
+
+        JPanel checkBoxPanel = new JPanel();
+        checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.Y_AXIS));
+
+        JCheckBox lockCameraAt = new JCheckBox("Lock camera at Model");
+        lockCameraAt.addItemListener(e -> {
+            cameraLocked = lockCameraAt.isSelected();
+            positionToLookAt = new Vector3f(0.f, 0.f, 0.f);
+            front = new Vector3f(0.f, 0.f, -1.f);
+            up = new Vector3f(0.f, 1.f, 0.f);
+        });
+
+        lockCameraAt.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        checkBoxPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        checkBoxPanel.add(lockCameraAt);
+
+        transformPanel.setBorder(BorderFactory.createTitledBorder("Position"));
+        transformPanel.setMaximumSize(new Dimension(Gui.GetWidth(), transformPanel.getPreferredSize().height));
+        transformPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(transformPanel);
+        panel.add(checkBoxPanel);
+
+        return new PanelEntity(panel, "Camera", false, false);
+    }
 }

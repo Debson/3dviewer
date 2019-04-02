@@ -15,6 +15,11 @@ public class Model extends Loader implements Panel
     private Colour color = new Colour(1.f);
     private String name;
     private Matrix4f matrixModel;
+    private boolean loadedFromFile = false;
+    private boolean shouldRender = true;
+    private boolean isModel = false;
+    private boolean isPrimitive = false;
+
 
     private Transform transform = new Transform();
 
@@ -26,14 +31,19 @@ public class Model extends Loader implements Panel
         int pos = name.lastIndexOf('\\');
         int dotPos = name.lastIndexOf('.');
         name = name.substring(pos + 1, dotPos);
-        Containers.AddPanelContainer(this);
+        Containers.panelContainer.add(this);
+        Containers.modelContainer.add(this);
+        loadedFromFile = true;
+        isModel = true;
     }
 
     public Model(String name, PrimitiveType type)
     {
         super(type);
         this.name = name;
-        Containers.AddPanelContainer(this);
+        Containers.panelContainer.add(this);
+        loadedFromFile = false;
+        isPrimitive = true;
     }
 
     public void setColor(Colour color)
@@ -51,15 +61,41 @@ public class Model extends Loader implements Panel
         return transform;
     }
 
+    public String getName()
+    {
+        return name;
+    }
+
+    public boolean isModel()
+    {
+        return isModel;
+    }
+
+    public boolean isPrimitive()
+    {
+        return isPrimitive;
+    }
+
+    public void delete()
+    {
+        Containers.modelContainer.remove(this);
+        name = "";
+        shouldRender = false;
+        // Free the GPU memory allocated for this model
+        free();
+    }
+
     public void Render()
     {
-        ShaderManager.GetShader().use();
-        matrixModel = new Matrix4f().translate(transform.getPosition()).scale(transform.getScale());
-        ShaderManager.GetShader().setVec4("color", color.r, color.g, color.b, color.a);
-        ShaderManager.GetShader().setMat4("model", matrixModel);
-        for(mdMesh mesh : super.meshes)
+        if(shouldRender)
         {
-            mesh.Render();
+            ShaderManager.GetShader().use();
+            matrixModel = new Matrix4f().translate(transform.getPosition()).scale(transform.getScale());
+            ShaderManager.GetShader().setVec4("color", color.r, color.g, color.b, color.a);
+            ShaderManager.GetShader().setMat4("model", matrixModel);
+            for (mdMesh mesh : super.meshes) {
+                mesh.Render();
+            }
         }
     }
 
@@ -81,13 +117,11 @@ public class Model extends Loader implements Panel
         }
 
 
-
         // MESH INFORMATION
         JPanel meshInfoPanel = new JPanel();
         meshInfoPanel.setLayout(new GridBagLayout());
-        meshInfoPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         meshInfoPanel.setBorder(BorderFactory.createTitledBorder("Mesh information"));
-
+        meshInfoPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         int verticesCount = 0;
         int indicesCount = 0;
@@ -101,13 +135,12 @@ public class Model extends Loader implements Panel
 
         GridBagConstraints gbc = new GridBagConstraints();
         JLabel label = new JLabel("Meshes Size: ");
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.weighty = 0.5;
-        gbc.weightx = 0.5;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.weightx = 0.1;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(5, 5, 5, 0);
+        gbc.insets = new Insets(2, 2, 2, 2);
         meshInfoPanel.add(label, gbc);
 
         label = new JLabel(Integer.toString(meshes.size()));
@@ -119,7 +152,6 @@ public class Model extends Loader implements Panel
         gbc.gridx = 0;
         gbc.gridy = 1;
         meshInfoPanel.add(label, gbc);
-
 
         label = new JLabel(Integer.toString(verticesCount));
         gbc.gridx = 1;
@@ -147,10 +179,10 @@ public class Model extends Loader implements Panel
         gbc.gridy = 3;
         meshInfoPanel.add(label, gbc);
 
+        meshInfoPanel.setMaximumSize(new Dimension(Gui.GetWidth(), meshInfoPanel.getPreferredSize().height));
 
-        panel.add(meshInfoPanel, BorderLayout.PAGE_START);
+        panel.add(meshInfoPanel);
 
-
-        return new PanelEntity(panel, this.name);
+        return new PanelEntity(panel, this.name, isModel, isPrimitive);
     }
 }

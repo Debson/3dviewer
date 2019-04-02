@@ -1,8 +1,6 @@
 package com.michal.debski;
 
 
-import org.joml.Vector2f;
-import org.joml.Vector2i;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -12,7 +10,7 @@ import java.nio.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -26,7 +24,7 @@ public class Core
 
     public void OpenGame(GameHandlerInterface gameHandler)
     {
-        windowProperties = new GameHandlerInterface.WindowProperties(1280, 720);
+        //windowProperties = new GameHandlerInterface.WindowProperties(1280, 720);
 
         GLFWErrorCallback.createPrint(System.err).set();
 
@@ -34,6 +32,23 @@ public class Core
             throw new IllegalStateException("Cannot initialize GLFW");
 
         glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
+
+        // Set window dimension basing on primary screen resolution
+        GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+        int resCouter = 0;
+        while (vidMode.width() <= windowProperties.resolutionWidth[resCouter] + Gui.GetWidth() ||
+                vidMode.height() <= windowProperties.resolutionHeight[resCouter])
+        {
+            resCouter++;
+        }
+
+        windowProperties = new GameHandlerInterface.WindowProperties(windowProperties.resolutionWidth[resCouter],
+                                                                     windowProperties.resolutionHeight[resCouter]);
+
+        System.out.println("Window Width:   " + windowProperties.resolutionWidth[resCouter]);
+        System.out.println("Window Height:  " + windowProperties.resolutionHeight[resCouter]);
 
         window = glfwCreateWindow(windowProperties.getWidth(), windowProperties.getHeight(), "model_loader", NULL, NULL);
         if(window == NULL)
@@ -47,9 +62,9 @@ public class Core
 
 
         // Display information about the system
-        System.out.println("Vendor:         " + GL11.glGetString(GL11.GL_VENDOR));
-        System.out.println("Renderer:       " + GL11.glGetString(GL11.GL_RENDERER));
-        System.out.println("Version:        " + GL11.glGetString(GL11.GL_VERSION));
+        System.out.println("\nVendor:         " + glGetString(GL_VENDOR));
+        System.out.println("Renderer:       " + glGetString(GL_RENDERER));
+        System.out.println("Version:        " + glGetString(GL_VERSION));
         System.out.println("LWJGL version:  " + Version.getVersion());
 
         gameHandler.OnWindowOpen();
@@ -112,6 +127,9 @@ public class Core
     {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         glfwSetFramebufferSizeCallback(window, fbCallback = new GLFWFramebufferSizeCallback() {
             public void invoke(long window, int width, int height) {
@@ -163,7 +181,7 @@ public class Core
 
             GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-            glfwSetWindowPos(window, (vidMode.width() - pWidth.get(0)) / 2,
+            glfwSetWindowPos(window, (vidMode.width() - pWidth.get(0) + Gui.GetWidth()) / 2,
                     (vidMode.height() - pHeight.get(0)) / 2);
         }
 
@@ -182,13 +200,6 @@ public class Core
 
     private void setupOpenGL()
     {
-        //glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
-    }
-
-    private void setupImGui()
-    {
-
-
     }
 }

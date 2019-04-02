@@ -1,32 +1,33 @@
 package com.michal.debski;
 
-import org.joml.Vector2i;
-import org.w3c.dom.css.Rect;
-
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
+
 import java.awt.*;
-import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.WindowAdapter;
+
 import java.util.ArrayList;
-import java.util.concurrent.Flow;
+
 
 public class Gui extends JFrame
 {
-    private int width = 350;
-    private int height = 300;
+    private static int width = 380;
     private int windowsTitleBarSize = 30;
-
 
     private JPanel globalPanel = new JPanel();
     private JPanel mainPanel = new JPanel();
+
+    JPanel indexPanelContainer = new JPanel();
+    private JPanel loadedModelsPanel = new JPanel();
+    private JPanel primitivesPanel = new JPanel();
     private JPanel settingsPanel = new JPanel();
+
     private JScrollPane settingsScrollPanel;
     private JPanel titleBar = new JPanel();
     private CardLayout cardLayout = new CardLayout();
+    private int modelLoadedCount = 0;
+    private String currentCardName = "";
 
     private int settingsButtonsCounter = 0;
 
@@ -37,31 +38,55 @@ public class Gui extends JFrame
 
         setLayout(new GridLayout(2, 1));
 
+        // Create title bar
         titleBar.setLayout(new BorderLayout());
         titleBar.setBackground(new Color(255,140,0));
         titleBar.setPreferredSize(new Dimension(width - 10, windowsTitleBarSize - 5));
         titleBar.setBorder(new BevelBorder(BevelBorder.RAISED));
-        JLabel label = new JLabel("Settings");
+        JLabel label = new JLabel("Settings", JLabel.CENTER);
         label.setFont(new Font("Serif", Font.BOLD, 18));
         titleBar.add(label, BorderLayout.CENTER);
 
+        // Split the frame into two separate panels. One is a title bar, other one
+        // is a panel that contains all buttons and settings for objects
         globalPanel.add(titleBar, BorderLayout.CENTER);
         globalPanel.add(mainPanel);
+
+        // Adjust main panel's dimensions
         mainPanel.setPreferredSize(new Dimension(width - 10, Core.windowProperties.getHeight() - 10));
         mainPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-        settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.PAGE_AXIS));
+        // Set up indexPanelContainer(contains three categories, models, primitives and settings)
+        indexPanelContainer.setLayout(new BoxLayout(indexPanelContainer, BoxLayout.Y_AXIS));
 
-        settingsPanel.setAutoscrolls(true);
-        settingsScrollPanel = new JScrollPane(settingsPanel);
+        loadedModelsPanel.setLayout(new BoxLayout(loadedModelsPanel, BoxLayout.Y_AXIS));
+        loadedModelsPanel.setBorder(BorderFactory.createTitledBorder("Models"));
 
+        primitivesPanel.setLayout(new BoxLayout(primitivesPanel, BoxLayout.Y_AXIS));
+        primitivesPanel.setBorder(BorderFactory.createTitledBorder("Primitives"));
+
+        settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
+        settingsPanel.setBorder(BorderFactory.createTitledBorder("Settings"));
+
+        indexPanelContainer.add(loadedModelsPanel);
+        indexPanelContainer.add(settingsPanel);
+
+        // Make it scrollable and put it in scroll pane, so if there will be
+        // more buttons than panel's dimension allow, the vertical scroll bar will appear
+        indexPanelContainer.setAutoscrolls(true);
+        settingsScrollPanel = new JScrollPane(indexPanelContainer);
 
         mainPanel.add(settingsScrollPanel, "Settings");
         cardLayout.show(mainPanel, "Settings");
+        currentCardName = "Settings";
 
         setContentPane(globalPanel);
+
+        // Create border around the frame
         getRootPane().setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
+        // Add focus listener, so it will restore model_loader window, when
+        // GUI frame has focus
         addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -85,6 +110,19 @@ public class Gui extends JFrame
                 width, Core.windowProperties.getHeight() + windowsTitleBarSize);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setVisible(true);
+
+        // Set cross platform feel and look for the Java Swing
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
     }
 
     public void setWidth(int width)
@@ -92,22 +130,9 @@ public class Gui extends JFrame
         this.width = width;
     }
 
-    public void setHeight(int height)
+    public static int GetWidth()
     {
-        this.height = height;
-    }
-
-    public JPanel getMainPanel()
-    {
-        return mainPanel;
-    }
-
-    public void addToMainPanel(JPanel panel, String panelName)
-    {
-        /*mainPanel.add(panel, panelName);
-        settingsButtonsCounter++;
-        //cardLayout.show(mainPanel, panelName);
-        validate();*/
+        return width;
     }
 
     public void setPosition()
@@ -116,9 +141,17 @@ public class Gui extends JFrame
                 Core.windowProperties.getPosY() - windowsTitleBarSize);
     }
 
+    /*
+     * Function:  createGui
+     * -----------------------------------------------
+     *  Function takes an ArrayList of objects that implements interface Panel
+     *  and calls function, which creates a GUI for that specific objects, then
+     *  puts it in a correct panel in a correct way
+     *
+     */
+
     public void createGui(ArrayList<Panel> panelEntityList)
     {
-        int buttonCounter = 0;
         for(Panel panel : panelEntityList)
         {
             PanelEntity panelEntity =  panel.createPanelEntity();
@@ -129,44 +162,106 @@ public class Gui extends JFrame
                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
+
             mainPanel.add(scrollPane, panelEntity.getPanelName());
 
             JButton settingButton = new JButton(panelEntity.getPanelName());
-            settingButton.setMaximumSize(new Dimension(200, 30));
+            settingButton.setMaximumSize(new Dimension((int)(Gui.GetWidth() * 0.6f), 30));
             settingButton.addActionListener(e -> {
                 cardLayout.show(mainPanel, panelEntity.getPanelName());
+                currentCardName = panelEntity.getPanelName();
             });
 
             settingButton.setAlignmentX(Component.CENTER_ALIGNMENT);
             // Create bottom padding for buttons
-            if(buttonCounter > 0)
-                settingsPanel.add(Box.createRigidArea(new Dimension(0, 15)), Component.LEFT_ALIGNMENT);
-            settingsPanel.add(settingButton);
-            buttonCounter++;
+            if(panelEntity.isModel())
+            {
+                if (loadedModelsPanel.getComponentCount() > 0)
+                    loadedModelsPanel.add(Box.createRigidArea(new Dimension(0, 15)), Component.LEFT_ALIGNMENT);
+                loadedModelsPanel.add(settingButton);
+            }
+            else if(panelEntity.isPrimitive())
+            {
+                if(indexPanelContainer.getComponentCount() < 3)
+                {
+                    indexPanelContainer.add(primitivesPanel, 1);
+                }
+                if (primitivesPanel.getComponentCount() > 0)
+                    primitivesPanel.add(Box.createRigidArea(new Dimension(0, 15)), Component.LEFT_ALIGNMENT);
+                primitivesPanel.add(settingButton);
+            }
+            else
+            {
+                if (settingsPanel.getComponentCount() > 0)
+                    settingsPanel.add(Box.createRigidArea(new Dimension(0, 15)), Component.LEFT_ALIGNMENT);
+                settingsPanel.add(settingButton);
+            }
 
             // Bottom GO BACK button
             JPanel buttonPanel = new JPanel();
-            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
             JButton goBackButton = new JButton("Go back");
             goBackButton.addActionListener(e -> {
-            cardLayout.show(mainPanel, "Settings");
+                cardLayout.show(mainPanel, "Settings");
+                currentCardName = "Settings";
             });
-            buttonPanel.add(goBackButton);
+            buttonPanel.add(goBackButton, Component.LEFT_ALIGNMENT);
+
+            buttonPanel.add(Box.createHorizontalGlue());
+
+            // Delete button
+            if(panelEntity.isModel())
+            {
+                JButton deleteObjectButton = new JButton("Delete");
+
+                // Disable that button for now. Might enable in further development
+                deleteObjectButton.setEnabled(false);
+
+                deleteObjectButton.addActionListener(e -> {
+                    if(currentCardName.equals(panelEntity.getPanelName()))
+                    {
+                        cardLayout.show(mainPanel, "Settings");
+                    }
+                    mainPanel.remove(scrollPane);
+                    loadedModelsPanel.remove(settingButton);
+                    for(Model model : Containers.modelContainer)
+                    {
+                        if(model.getName().equals(panelEntity.getPanelName()))
+                        {
+                            model.delete();
+                        }
+                    }
+                    modelLoadedCount--;
+                    validate();
+                    repaint();
+                });
+                buttonPanel.add(deleteObjectButton, Component.RIGHT_ALIGNMENT);
+                modelLoadedCount++;
+            }
+
+            buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             buttonPanel.setOpaque(false);
-
-
             panelEntity.getPanel().add(buttonPanel, 0);
+
             panelEntity.getPanel().setAutoscrolls(true);
             validate();
             repaint();
         }
     }
 
-
-    public void replaceModel(String modelName, Model newModel)
+    /*
+     * Function: replaceModel
+     * -----------------------------------------------
+     *  Function that replaces GUI for currently loaded model.
+     *
+     */
+    public void replaceModel()
     {
-        mainPanel.remove(1);
-        settingsPanel.remove(0);
+        if(modelLoadedCount > 0)
+        {
+            //mainPanel.remove(1);
+            loadedModelsPanel.remove(0);
+        }
 
         PanelEntity panelEntity = Containers.panelContainer.get(Containers.panelContainer.size() - 1).createPanelEntity();
 
@@ -177,37 +272,70 @@ public class Gui extends JFrame
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
+        // Bug
         mainPanel.add(scrollPane, panelEntity.getPanelName());
 
+
         JButton settingButton = new JButton(panelEntity.getPanelName());
-        settingButton.setMaximumSize(new Dimension(200, 30));
+        settingButton.setMaximumSize(new Dimension((int)(Gui.GetWidth() * 0.6f), 30));
         settingButton.addActionListener(e -> {
             cardLayout.show(mainPanel, panelEntity.getPanelName());
+            currentCardName = panelEntity.getPanelName();
         });
 
         settingButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        // Create bottom padding for buttons
 
-        settingsPanel.add(Box.createRigidArea(new Dimension(0, 15)), Component.LEFT_ALIGNMENT);
-        settingsPanel.add(settingButton, 0);
+        //loadedModelsPanel.add(Box.createRigidArea(new Dimension(0, 15)), Component.LEFT_ALIGNMENT);
+        loadedModelsPanel.add(settingButton, 0);
 
         // Bottom GO BACK button
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         JButton goBackButton = new JButton("Go back");
         goBackButton.addActionListener(e -> {
             cardLayout.show(mainPanel, "Settings");
+            currentCardName = "Settings";
         });
-        buttonPanel.add(goBackButton);
-        buttonPanel.setOpaque(false);
+        buttonPanel.add(goBackButton, Component.LEFT_ALIGNMENT);
 
+        buttonPanel.add(Box.createHorizontalGlue());
 
+        // Delete button
+        if(panelEntity.isModel())
+        {
+            JButton deleteObjectButton = new JButton("Delete");
+
+            // Disable that button for now. Might enable in further development
+            deleteObjectButton.setEnabled(false);
+
+            deleteObjectButton.addActionListener(e -> {
+                if(currentCardName.equals(panelEntity.getPanelName()))
+                {
+                    cardLayout.show(mainPanel, "Settings");
+                }
+                mainPanel.remove(scrollPane);
+                loadedModelsPanel.remove(settingButton);
+                for(Model model : Containers.modelContainer)
+                {
+                    if(model.getName().equals(panelEntity.getPanelName()))
+                    {
+                        model.delete();
+                    }
+                }
+                modelLoadedCount--;
+                validate();
+                repaint();
+            });
+            buttonPanel.add(deleteObjectButton, Component.RIGHT_ALIGNMENT);
+            modelLoadedCount++;
+        }
+
+        buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panelEntity.getPanel().add(buttonPanel, 0);
         panelEntity.getPanel().setAutoscrolls(true);
         validate();
         repaint();
 
-        validate();
-        repaint();
+        cardLayout.show(mainPanel, "Settings");
     }
 }

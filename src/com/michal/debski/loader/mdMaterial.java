@@ -1,11 +1,13 @@
 package com.michal.debski.loader;
 
+import com.michal.debski.Gui;
 import com.michal.debski.Panel;
 import com.michal.debski.PanelEntity;
 import com.michal.debski.utilities.PanelUtility;
 import org.joml.Vector3f;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class mdMaterial implements Panel
 {
@@ -62,8 +64,41 @@ public class mdMaterial implements Panel
                 new int[]{100, 100 , 100},
                 100);
 
+
+        // Retrieve sliders container and add shininess slider to the end
+        JPanel slidersContainer = (JPanel) panel.getComponent(0);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridy = 0;
+        JLabel label = new JLabel("Shininess", JLabel.CENTER);
+
+        // X
+        JLabel valueLabel = new JLabel(String.format("%-2.2f", shininess), JLabel.CENTER);
+        valueLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+        valueLabel.setPreferredSize(new Dimension(40, 20));
+
+        JSlider slider = new JSlider(JSlider.HORIZONTAL, 2, 128, (int)(shininess));
+        slider.addChangeListener(e ->{
+            shininess = slider.getValue();
+            valueLabel.setText(String.format("%-2.2f", shininess));
+        });
+
+        gbc.gridy = slidersContainer.getComponentCount();
+        gbc.gridx = 1;
+        slidersContainer.add(label, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        label = new JLabel("Value");
+        slidersContainer.add(label, gbc);
+        gbc.gridx++;
+        slidersContainer.add(slider, gbc);
+        gbc.gridx++;
+        slidersContainer.add(valueLabel, gbc);
+
+
+        //panel.setMaximumSize(new Dimension(Gui.GetWidth(), panel.getPreferredSize().height));
         panel.setBorder(BorderFactory.createTitledBorder("Material"));
 
-        return new PanelEntity(panel, "Material");
+        return new PanelEntity(panel, "Material", false, false);
     }
 }

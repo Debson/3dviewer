@@ -54,6 +54,22 @@ void main()
     {
         FragColor *= calculateDirectionalLight();
     }
+    else if(textureActive)
+    {
+        vec3 ambient = material.diffuse * texture(material.diffuseMap, TexCoords).rgb;
+        vec3 diffuse = material.diffuse * texture(material.diffuseMap, TexCoords).rgb;
+        vec3 specular = material.specular * texture(material.specularMap, TexCoords).rgb;
+
+        FragColor *= vec4(ambient + diffuse + specular, 1.0);
+    }
+    /*else
+    {
+        vec3 ambient = material.diffuse;
+        vec3 diffuse = material.diffuse;
+        vec3 specular = material.specular;
+
+        FragColor *= vec4(ambient + diffuse + specular, 1.0);
+    }*/
 
     /*if((FragPos.x < -0.8 || FragPos.x > 0.8 || FragPos.z < -0.8 || FragPos.z > 0.8) && (FragPos.y > 0.8 || FragPos.y < -0.8))
         FragColor = vec4(1.0, 0.5, 1.0, 1.0);
@@ -90,7 +106,9 @@ vec4 calculateDirectionalLight()
     else
         specular = (spec * material.specular);
 
-    float shadow = CalculateShadows(FragPosLightSpace);
+    float shadow = 0.0;
+    if(shadowsActive)
+        shadow = CalculateShadows(FragPosLightSpace);
 
     return vec4((ambient + (1.0 - shadow) * (diffuse + specular)) * vec3(dirLight.color), 1.0);
 }
