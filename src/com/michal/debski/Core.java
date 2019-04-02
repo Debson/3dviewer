@@ -1,6 +1,7 @@
 package com.michal.debski;
 
 
+import com.michal.debski.utilities.FpsCounter;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -89,6 +90,8 @@ public class Core
             prevTime = currentTime;
             currentTime = Time.GetTicks();
             Time.deltaTime = currentTime - prevTime;
+
+            FpsCounter.Update();
 
             gameHandler.OnNewFrame();
             Input.OnStartFrame();
