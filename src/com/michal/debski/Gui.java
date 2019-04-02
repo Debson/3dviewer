@@ -232,8 +232,6 @@ public class Gui extends JFrame
                         }
                     }
                     modelLoadedCount--;
-                    validate();
-                    repaint();
                 });
                 buttonPanel.add(deleteObjectButton, Component.RIGHT_ALIGNMENT);
                 modelLoadedCount++;

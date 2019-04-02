@@ -74,6 +74,7 @@ public class Colour implements Panel
         panel.add(jcc);
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setBorder(BorderFactory.createTitledBorder("Colour"));
+        panel.setMaximumSize(new Dimension(Gui.GetWidth(), 250));
 
         return new PanelEntity(panel, "ColorPicker", false, false);
     }
