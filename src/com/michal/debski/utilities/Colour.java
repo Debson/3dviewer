@@ -52,7 +52,7 @@ public class Colour implements Panel
 
         // Remove preview panel
         jcc.setPreviewPanel(new JPanel());
-        
+
 
         AbstractColorChooserPanel[] panels = jcc.getChooserPanels();
         for(AbstractColorChooserPanel accp : panels)
@@ -74,7 +74,6 @@ public class Colour implements Panel
         panel.add(jcc);
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setBorder(BorderFactory.createTitledBorder("Colour"));
-        panel.setMaximumSize(new Dimension(Gui.GetWidth(), panel.getPreferredSize().height));
 
         return new PanelEntity(panel, "ColorPicker", false, false);
     }
