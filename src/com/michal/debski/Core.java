@@ -191,7 +191,7 @@ public class Core
         glfwMakeContextCurrent(window);
 
         // V-Sync turned on
-        glfwSwapInterval(1);
+        glfwSwapInterval(0);
 
         // Disable cursor, so it won't block at screen bounds
         //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
