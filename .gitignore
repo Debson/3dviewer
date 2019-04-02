@@ -6,3 +6,5 @@ libs/
 
 # File Extensions to ignore
 *.iml
+*.class
+*.txt
