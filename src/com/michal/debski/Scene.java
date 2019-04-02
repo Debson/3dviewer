@@ -138,7 +138,15 @@ public class Scene implements GameHandlerInterface, SceneInterface
         Vector2f relMousePos = Input.GetRelativeMousePos();
 
         if(Input.IsKeyDown(Keycode.MouseMiddle) || Input.IsKeyDown(Keycode.E))
+        {
+            Window.CursorDisabled(true);
             camera.processMouseMovement(relMousePos.x, relMousePos.y);
+        }
+        else if(Input.IsKeyReleased(Keycode.MouseMiddle) || Input.IsKeyReleased(Keycode.E))
+        {
+            Window.CursorDisabled(false);
+        }
+
 
         float speed = cameraMoveSpeed;
 

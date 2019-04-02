@@ -25,4 +25,12 @@ public class Window
     {
         glfwRestoreWindow(window);
     }
+
+    static void CursorDisabled(boolean cursorDisabled)
+    {
+        if(cursorDisabled)
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        else
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
 }
