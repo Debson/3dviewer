@@ -7,6 +7,7 @@ import com.michal.debski.ShaderManager;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL30.*;
@@ -17,8 +18,8 @@ public class Shadows
     private final int shadowWidth = 8192;
     private final int shadowHeight = 8192;
 
-    private final String shadowShaderVertPath = "shaders/shadowShader.vert";
-    private final String shadowShaderFragPath = "shaders/shadowShader.frag";
+    private final String shadowShaderVertPath = "shaders" + File.separator + "shadowShader.vert";
+    private final String shadowShaderFragPath = "shaders" + File.separator + "shadowShader.frag";
     public final int shaderTextureNum = GL_TEXTURE6;
 
 

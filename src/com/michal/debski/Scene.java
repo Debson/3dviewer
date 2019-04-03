@@ -8,6 +8,8 @@ import com.michal.debski.utilities.Colour;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import java.io.File;
+
 
 public class Scene implements GameHandlerInterface, SceneInterface
 {
@@ -23,7 +25,7 @@ public class Scene implements GameHandlerInterface, SceneInterface
     @Override
     public void OnWindowOpen()
     {
-        shader = new Shader("shaders/default.vert", "shaders/default.frag");
+        shader = new Shader("shaders" + File.separator + "default.vert", "shaders" + File.separator + "default.frag");
 
 
         camera = new Camera(new Vector2f(
@@ -33,11 +35,11 @@ public class Scene implements GameHandlerInterface, SceneInterface
 
 
         // Remember to use "\\" directory delimiter! Otherwise there will be an error.
-        String path = "assets/teapot.obj";
-        String path2 = "assets/nanosuit/nanosuit.obj";
-        String path3 = "assets/teddybear.obj";
-        String path4 = "assets/head.obj";
-        String path5 = "assets/wolf.obj";
+        String path = "assets" + File.separator + "teapot.obj";
+        String path2 = "assets" + File.separator + "nanosuit" + File.separator + "nanosuit.obj";
+        String path3 = "assets" + File.separator + "teddybear.obj";
+        String path4 = "assets" + File.separator + "head.obj";
+        String path5 = "assets" + File.separator + "wolf.obj";
 
         myModel = new Model(path2);
         myModel.getTransform().setPosition(new Vector3f(0.f, 0.f, 0.f));

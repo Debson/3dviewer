@@ -4,13 +4,14 @@ import com.michal.debski.utilities.FpsCounter;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.filechooser.FileSystemView;
 
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.concurrent.Flow;
 
 
 public class Gui extends JFrame
@@ -32,6 +33,7 @@ public class Gui extends JFrame
     private CardLayout cardLayout = new CardLayout();
     private int modelLoadedCount = 0;
     private String currentCardName = "";
+    private int fileChooserReturnValue = -1;
 
     private int settingsButtonsCounter = 0;
 
@@ -85,6 +87,31 @@ public class Gui extends JFrame
         indexPanelContainer.add(fpsPanel);
         indexPanelContainer.add(loadedModelsPanel);
         indexPanelContainer.add(settingsPanel);
+
+        // File browser
+        JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getDefaultDirectory());
+        JButton fileChooserButton = new JButton("Browser file");
+        fileChooserButton.setMaximumSize(new Dimension((int)(Gui.GetWidth() * 0.6f), 30));
+        fileChooserButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        fileChooser.addActionListener(e -> {
+            if(fileChooserReturnValue == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+
+                System.out.println(selectedFile.getAbsolutePath());
+                fileChooserReturnValue = -1;
+
+            }
+
+        });
+        fileChooserButton.addActionListener(e -> {
+            File workingDirectory = new File(System.getProperty("user.dir"));
+            fileChooser.setCurrentDirectory(workingDirectory);
+            fileChooserReturnValue = fileChooser.showOpenDialog(this);
+        });
+
+
+        settingsPanel.add(fileChooserButton);
 
         // Make it scrollable and put it in scroll pane, so if there will be
         // more buttons than panel's dimension allow, the vertical scroll bar will appear
@@ -208,8 +235,8 @@ public class Gui extends JFrame
             else
             {
                 if (settingsPanel.getComponentCount() > 0)
-                    settingsPanel.add(Box.createRigidArea(new Dimension(0, 15)), Component.LEFT_ALIGNMENT);
-                settingsPanel.add(settingButton);
+                    settingsPanel.add(Box.createRigidArea(new Dimension(0, 15)), Component.LEFT_ALIGNMENT, 0);
+                settingsPanel.add(settingButton, 0);
             }
 
             // Bottom GO BACK button

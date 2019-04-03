@@ -87,9 +87,9 @@ public class Loader
             return;
         }
 
-        int dirDelimiter = path.lastIndexOf('/');
+        int dirDelimiter = path.lastIndexOf(File.separator);
         directory = path.substring(0, dirDelimiter);
-        directory += '/';
+        directory += File.separator;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
