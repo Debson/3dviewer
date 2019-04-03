@@ -1,16 +1,21 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Image class manages creating an OpenGL texture from a path to an image file.
+ *
+ */
+
 package com.michal.debski;
 
-import com.michal.debski.loader.Loader;
-import com.michal.debski.loader.mdMesh;
-import com.michal.debski.utilities.Colour;
-import com.michal.debski.utilities.Transform;
+import com.michal.debski.loader.*;
+import com.michal.debski.utilities.*;
 import org.joml.Matrix4f;
 
 import javax.swing.*;
 import java.awt.*;
 
 
-public class Model extends Loader implements Panel
+public class Model implements Panel
 {
     private Colour color = new Colour(1.f);
     private String name;
@@ -19,15 +24,15 @@ public class Model extends Loader implements Panel
     private boolean shouldRender = true;
     private boolean isModel = false;
     private boolean isPrimitive = false;
-
+    private Loader loader;
 
     private Transform transform = new Transform();
 
     public Model(String path)
     {
-        super(path);
+        loader = new Loader(path);
 
-        name = new String(path);
+        name = path;
         int pos = name.lastIndexOf('\\');
         int dotPos = name.lastIndexOf('.');
         name = name.substring(pos + 1, dotPos);
@@ -37,9 +42,9 @@ public class Model extends Loader implements Panel
         isModel = true;
     }
 
-    public Model(String name, PrimitiveType type)
+    public Model(String name, Loader.PrimitiveType type)
     {
-        super(type);
+        loader = new Loader(type);
         this.name = name;
         Containers.panelContainer.add(this);
         loadedFromFile = false;
@@ -82,7 +87,22 @@ public class Model extends Loader implements Panel
         name = "";
         shouldRender = false;
         // Free the GPU memory allocated for this model
-        free();
+        loader.free();
+    }
+
+    public void createNew(String path)
+    {
+        // Free the GPU memory allocated for this model
+        loader.free();
+
+        loader = new Loader(path);
+        name = path;
+        int pos = name.lastIndexOf('\\');
+        int dotPos = name.lastIndexOf('.');
+        name = name.substring(pos + 1, dotPos);
+        shouldRender = true;
+        loadedFromFile = true;
+        isModel = true;
     }
 
     public void Render()
@@ -93,7 +113,7 @@ public class Model extends Loader implements Panel
             matrixModel = new Matrix4f().translate(transform.getPosition()).scale(transform.getScale());
             ShaderManager.GetShader().setVec4("color", color.r, color.g, color.b, color.a);
             ShaderManager.GetShader().setMat4("model", matrixModel);
-            for (mdMesh mesh : super.meshes) {
+            for (mdMesh mesh : loader.meshes) {
                 mesh.Render();
             }
         }
@@ -111,8 +131,8 @@ public class Model extends Loader implements Panel
 
         panel.add(transformPanel);
         panel.add(colorPanel);
-        if(meshes.size() == 1) {
-            materialPanel = meshes.get(0).material.createPanelEntity().getPanel();
+        if(loader.meshes.size() == 1) {
+            materialPanel = loader.meshes.get(0).material.createPanelEntity().getPanel();
             panel.add(materialPanel);
         }
 
@@ -126,7 +146,7 @@ public class Model extends Loader implements Panel
         int verticesCount = 0;
         int indicesCount = 0;
         int texturesCount = 0;
-        for(mdMesh mesh : meshes)
+        for(mdMesh mesh : loader.meshes)
         {
             verticesCount += mesh.vertices.size();
             indicesCount += mesh.indices.size();
@@ -143,7 +163,7 @@ public class Model extends Loader implements Panel
         gbc.insets = new Insets(2, 2, 2, 2);
         meshInfoPanel.add(label, gbc);
 
-        label = new JLabel(Integer.toString(meshes.size()));
+        label = new JLabel(Integer.toString(loader.meshes.size()));
         gbc.gridx = 1;
         gbc.gridy = 0;
         meshInfoPanel.add(label, gbc);

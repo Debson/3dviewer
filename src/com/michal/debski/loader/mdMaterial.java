@@ -1,6 +1,12 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   mdMaterial class is used to store necessary data about material of a mdMesh.
+ *
+ */
+
 package com.michal.debski.loader;
 
-import com.michal.debski.Gui;
 import com.michal.debski.Panel;
 import com.michal.debski.PanelEntity;
 import com.michal.debski.utilities.PanelUtility;

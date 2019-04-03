@@ -1,3 +1,10 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   GameHandlerInterface creates an higher abstraction layer between user and the application
+ *
+ */
+
 package com.michal.debski;
 
 public interface GameHandlerInterface

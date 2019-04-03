@@ -1,3 +1,10 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Simple implementation of a timer. Have only the functionality which was needed for this application.
+ *
+ */
+
 package com.michal.debski.utilities;
 
 import com.michal.debski.Time;

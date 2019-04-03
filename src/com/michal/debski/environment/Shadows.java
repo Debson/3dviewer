@@ -1,3 +1,11 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Shadows class manages creating framebuffer and filling the depth texture
+ *                      with a current scene.
+ *
+ */
+
 package com.michal.debski.environment;
 
 import com.michal.debski.Core;

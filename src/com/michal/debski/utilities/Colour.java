@@ -1,3 +1,11 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Colour class is used to hold RGBA colors;
+ *                      Colour's GUI is a modified version of a JColorChooser component.
+ *
+ */
+
 package com.michal.debski.utilities;
 
 import com.michal.debski.Gui;

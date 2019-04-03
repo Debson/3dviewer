@@ -87,6 +87,11 @@ public class Scene implements GameHandlerInterface, SceneInterface
     {
         processCameraInput();
 
+        if(gui != null)
+        {
+            gui.Update();
+        }
+
     }
 
     @Override
@@ -108,9 +113,7 @@ public class Scene implements GameHandlerInterface, SceneInterface
     @Override
     public void OnFileDrop(String pathOfDroppedFile)
     {
-        myModel = null;
-        myModel = new Model(pathOfDroppedFile);
-        gui.replaceModel();
+        myModel.createNew(pathOfDroppedFile);
     }
 
     @Override

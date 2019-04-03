@@ -1,3 +1,10 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Helper class, used to reduce redundancy in code, when creating panels for a different objects
+ *
+ */
+
 package com.michal.debski.utilities;
 
 import org.joml.Vector3f;

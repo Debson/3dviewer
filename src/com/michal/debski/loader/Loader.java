@@ -1,3 +1,17 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Loader class is responsible for reading Wavefront's .obj file and retrieving necessary
+ *                      to render data from it. File that is going to be read, MUST be in a approperiate format.
+ *                      Usually software such as Maya or Blender are able to generate .obj file, in a format, which
+ *                      can be quickly read by this class.
+ *                      Class is able to read vertices, texture coordinates, normals and also external .mtl file,
+ *                      with defined material properties.
+ *                      TODO: Generate normals from vertices, if they are not in a loaded file.
+ *
+ *
+ */
+
 package com.michal.debski.loader;
 
 import com.michal.debski.Vertices;
@@ -71,6 +85,10 @@ public class Loader
 
     public Loader(String path)
     {
+        meshes = new Vector<mdMesh>();
+        mtlFilePath = new String();
+         directory = new String();
+
         // The idea is to read all vertices, texture coordinates and normals
         // from file and then map them to objects basing on their faces.
         // Every object has it's own data about faces

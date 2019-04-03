@@ -1,5 +1,13 @@
-package com.michal.debski;
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Core class creates a glfw window, context and configure other mandatory
+ *                      OpenGL and glfw options. Class also structures how the application is being
+ *                      run (Open -> Main Loop -> Close)
+ *
+ */
 
+package com.michal.debski;
 
 import com.michal.debski.utilities.FpsCounter;
 import org.lwjgl.*;
@@ -20,8 +28,6 @@ public class Core
     private long window;
     public static GameHandlerInterface.WindowProperties windowProperties;
     GLFWFramebufferSizeCallback fbCallback;
-
-
 
     public void OpenGame(GameHandlerInterface gameHandler)
     {

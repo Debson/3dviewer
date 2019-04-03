@@ -1,3 +1,10 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Camera class calculates all the properties of a 3D camera.
+ *
+ */
+
 package com.michal.debski;
 
 import com.michal.debski.utilities.Transform;
@@ -119,6 +126,7 @@ public class Camera implements Panel
 
         public void processKeyboard(CameraMovement dir, float dT, float speed)
         {
+            // Different functionality when camera is locked at object
             float velocity = speed * dT;
             Vector3f pos = new Vector3f();
             switch(dir)

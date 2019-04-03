@@ -6,6 +6,14 @@ import org.lwjgl.system.MemoryStack;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.file.Files;
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   mdShader class is used to create a shader program and link code to it.
+ *                      Class uses various methods for better interaction with shaders.
+ *
+ */
+
 import java.nio.file.Paths;
 
 import static org.lwjgl.opengl.GL20.*;

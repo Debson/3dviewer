@@ -1,3 +1,12 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Light class has all the properties of a light and additional functionality.
+ *                      Class also manages rendering scene with a shadow.
+ *
+ */
+
+
 package com.michal.debski.environment;
 
 import com.michal.debski.*;

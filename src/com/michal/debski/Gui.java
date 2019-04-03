@@ -1,9 +1,20 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Gui constructor creates JFrame and all the panels that are responsible for the general layout.
+ *                      Class also uses interface Panel and class PanelEntity, to create GUI components and put them into
+ *                      appropriate panels.
+ *
+ */
+
+
 package com.michal.debski;
 
 import com.michal.debski.utilities.FpsCounter;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileSystemView;
 
 import java.awt.*;
@@ -12,6 +23,7 @@ import java.awt.event.FocusListener;
 
 import java.io.File;
 import java.util.ArrayList;
+
 
 
 public class Gui extends JFrame
@@ -33,13 +45,16 @@ public class Gui extends JFrame
     private CardLayout cardLayout = new CardLayout();
     private int modelLoadedCount = 0;
     private String currentCardName = "";
-    private int fileChooserReturnValue = -1;
+    JFileChooser fileChooser = null;
 
-    private int settingsButtonsCounter = 0;
+    private int fileBrowserReturnValue = -1;
+    private Model model;
 
     public Gui()
     {
         super("Settings");
+        this.model = model;
+
         mainPanel.setLayout(cardLayout);
 
         setLayout(new GridLayout(2, 1));
@@ -89,25 +104,31 @@ public class Gui extends JFrame
         indexPanelContainer.add(settingsPanel);
 
         // File browser
-        JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getDefaultDirectory());
+        fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getDefaultDirectory());
+        fileChooser.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                if(f.isDirectory())
+                    return true;
+                else
+                    return f.getName().toLowerCase().endsWith(".obj");
+            }
+
+            @Override
+            public String getDescription() {
+                return "Wavefront .OBJ";
+            }
+        });
         JButton fileChooserButton = new JButton("Browser file");
         fileChooserButton.setMaximumSize(new Dimension((int)(Gui.GetWidth() * 0.6f), 30));
         fileChooserButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        fileChooser.addActionListener(e -> {
-            if(fileChooserReturnValue == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
 
-                System.out.println(selectedFile.getAbsolutePath());
-                fileChooserReturnValue = -1;
-
-            }
-
-        });
         fileChooserButton.addActionListener(e -> {
             File workingDirectory = new File(System.getProperty("user.dir"));
             fileChooser.setCurrentDirectory(workingDirectory);
-            fileChooserReturnValue = fileChooser.showOpenDialog(this);
+
+            fileBrowserReturnValue = fileChooser.showOpenDialog(this);
         });
 
 
@@ -181,6 +202,32 @@ public class Gui extends JFrame
     {
         setLocation(Core.windowProperties.getPosX() - width,
                 Core.windowProperties.getPosY() - windowsTitleBarSize);
+    }
+
+    /*
+     * Function: Update
+     * -----------------------------------------------
+     *  Used to create a Model from a path obtained from JFileChooser. Model cannot be created
+     *  inside JFileChooser listener, because it runs on a different thread than the context
+     *  created for application. Function is called every frame, and when JFileChooser
+     *  action is finished, then function create a new model.
+     *
+     */
+
+    public void Update()
+    {
+        if(fileBrowserReturnValue == JFileChooser.APPROVE_OPTION)
+        {
+            // Get selected file
+            File selectedFile = fileChooser.getSelectedFile();
+            // Get loaded model from the end of the model container(there is only one, but using this
+            // technique, it can be easy to have more than 1 model loaded from file)
+            Containers.modelContainer.get(Containers.modelContainer.size() - 1).createNew(selectedFile.getAbsolutePath());
+            replaceModel();
+
+            // Prevent entering this if statement again.
+            fileBrowserReturnValue = JFileChooser.ERROR_OPTION;
+        }
     }
 
     /*
@@ -303,7 +350,7 @@ public class Gui extends JFrame
             loadedModelsPanel.remove(0);
         }
 
-        PanelEntity panelEntity = Containers.panelContainer.get(Containers.panelContainer.size() - 1).createPanelEntity();
+        PanelEntity panelEntity = Containers.modelContainer.get(Containers.modelContainer.size() - 1).createPanelEntity();
 
         panelEntity.getPanel().setBorder(BorderFactory.createTitledBorder(panelEntity.getPanelName()));
 

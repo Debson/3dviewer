@@ -1,3 +1,12 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   mdMesh class is used to store necessary data about mesh, which is a part of the Model.
+ *                      Class also loads obtained data to the graphics memory, through OpenGL, and is responsible
+ *                      for rendering a mesh.
+ *
+ */
+
 package com.michal.debski.loader;
 
 import com.michal.debski.ShaderManager;

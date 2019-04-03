@@ -1,3 +1,10 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Class responsible for updating FPS label.
+ *
+ */
+
 package com.michal.debski.utilities;
 
 import com.michal.debski.Time;

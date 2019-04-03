@@ -1,11 +1,13 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Input class manages keyboard and mouse input from the user.
+ *
+ */
+
 package com.michal.debski;
 
 import org.joml.Vector2f;
-import org.lwjgl.BufferUtils;
-
-import java.nio.DoubleBuffer;
-import java.security.Key;
-import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 

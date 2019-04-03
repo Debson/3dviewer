@@ -1,3 +1,10 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   DirectionalLight extends Light class, and manages methods that are specific for a directional light.
+ *
+ */
+
 package com.michal.debski.environment;
 
 import com.michal.debski.ShaderManager;

@@ -1,3 +1,10 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Transform class hold information about the position and scale of an object
+ *
+ */
+
 package com.michal.debski.utilities;
 
 import com.michal.debski.Gui;

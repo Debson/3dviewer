@@ -1,3 +1,10 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Image class manages creating an OpenGL texture from a path to an image file.
+ *
+ */
+
 package com.michal.debski.loader;
 
 import org.lwjgl.system.MemoryStack;
@@ -11,7 +18,6 @@ import static org.lwjgl.stb.STBImage.*;
 
 public class Image
 {
-
     public static int LoadImage(String path)
     {
         ByteBuffer imageBuffer;
