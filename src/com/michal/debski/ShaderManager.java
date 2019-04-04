@@ -1,3 +1,10 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Static class used to GET and SET a currently used Shader in the application.
+ *
+ */
+
 package com.michal.debski;
 
 public class ShaderManager

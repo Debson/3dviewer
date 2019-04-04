@@ -1,7 +1,15 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Scene class is used to manage everything that is displayed on the screen. Class,
+ *                      through few abstraction layers, provides necessary methods, that structures into
+ *                      3 phases(Start, Run, Finishh) with additional functionality such as (OnFileDrop, OnWindowFocus etc.)
+ *
+ */
+
 package com.michal.debski;
 
 import com.michal.debski.environment.DirectionalLight;
-import com.michal.debski.environment.Light;
 import com.michal.debski.loader.Loader;
 import com.michal.debski.utilities.Colour;
 
@@ -20,7 +28,6 @@ public class Scene implements GameHandlerInterface, SceneInterface
     private Model myModel, floor, cube;
 
     private Gui gui;
-
 
     @Override
     public void OnWindowOpen()
@@ -130,8 +137,7 @@ public class Scene implements GameHandlerInterface, SceneInterface
         gui.setAlwaysOnTop(hasFocus);
     }
 
-    @Override
-    public void updateMatrices(Shader shader)
+    private void updateMatrices(Shader shader)
     {
         shader.use();
         shader.setMat4("projection", camera.getProjectionMatrix());
@@ -151,7 +157,6 @@ public class Scene implements GameHandlerInterface, SceneInterface
         {
             Window.CursorDisabled(false);
         }
-
 
         float speed = cameraMoveSpeed;
 

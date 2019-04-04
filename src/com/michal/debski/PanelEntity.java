@@ -1,3 +1,10 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Wrapper for a JPanel and panelName as a String
+ *
+ */
+
 package com.michal.debski;
 
 import javax.swing.*;

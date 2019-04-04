@@ -1,3 +1,10 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Static class used to access some of the GLFW functions on a window
+ *
+ */
+
 package com.michal.debski;
 
 import static org.lwjgl.glfw.GLFW.*;

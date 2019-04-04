@@ -1,3 +1,10 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Class description:   Wrapper class for a mdShader
+ *
+ */
+
 package com.michal.debski;
 
 import org.joml.Matrix4f;

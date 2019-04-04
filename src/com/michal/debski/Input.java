@@ -11,6 +11,7 @@ import org.joml.Vector2f;
 
 import static org.lwjgl.glfw.GLFW.*;
 
+// Enum that stores most of the possible keystrokes
 enum Keycode
 {
 	None(GLFW_KEY_UNKNOWN),

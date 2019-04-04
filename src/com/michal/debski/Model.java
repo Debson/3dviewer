@@ -1,7 +1,8 @@
 /* Date: 03/04/2019
  * Developer: Michal Debski
  * Github: github.com/debson
- * Class description:   Image class manages creating an OpenGL texture from a path to an image file.
+ * Class description:   Model class is a wrapper for a Loader class. Model has two constructors, one creates
+ *                      model from a provided path, another can create a primitive shape(plane, cube)
  *
  */
 

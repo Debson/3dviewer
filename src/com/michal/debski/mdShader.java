@@ -25,11 +25,13 @@ public class mdShader
 
     protected mdShader(String vertexPath, String fragmentPath)
     {
+        // Create a shader program
         programID = glCreateProgram();
         if(programID == 0)
             //throw new Exception("Could not create a Shader Program");
             System.out.println("Could not create a Shader Program");
 
+        // Create vertex and fragment shader from code
         try {
             vertexID = createShader(vertexPath, GL_VERTEX_SHADER);
         } catch (Exception e) {
@@ -41,6 +43,7 @@ public class mdShader
             e.printStackTrace();
         }
 
+        // Link shaders with shader program
         glLinkProgram(programID);
         if(glGetProgrami(programID, GL_LINK_STATUS) == 0)
             //throw new Exception("Error linking Shader code " + glGetProgramInfoLog(programID, 1024));
@@ -52,6 +55,7 @@ public class mdShader
         if(fragmentID != 0)
             glDetachShader(programID, fragmentID);
 
+        // Make sure everything went right
         glValidateProgram(programID);
         if(glGetProgrami(programID, GL_VALIDATE_STATUS) == 0)
             //throw new Exception("Error at validating shader " + glGetProgramInfoLog(programID, 1024));
