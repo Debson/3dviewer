@@ -30,7 +30,6 @@ public class mdTimer
         {
             stopped = true;
         }
-
     }
 
     public void restart()

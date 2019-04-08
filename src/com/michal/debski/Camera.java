@@ -99,7 +99,7 @@ public class Camera implements Panel
                 view = new Matrix4f().lookAt(transform.getPosition(), pos, up);
 
 
-            // Update labels
+            // Update GUI labels on position change
             if(prevPosition.equals(transform.getPosition()) == false)
             {
                 prevPosition = new Vector3f(transform.getPosition());
@@ -113,8 +113,6 @@ public class Camera implements Panel
 
         public Matrix4f getProjectionMatrix()
         {
-            //projection = new Matrix4f().perspective((float)Math.toRadians(zoom), screenRes.x / screenRes.y, 0.1f, 1000.f);
-
             return new Matrix4f().perspective((float)Math.toRadians(zoom), screenRes.x / screenRes.y, 0.1f, 1000.f);
         }
 
@@ -206,11 +204,6 @@ public class Camera implements Panel
             }
         }
 
-        public void processMouseScroll(float offsetY)
-        {
-
-        }
-
         private void updateCameraVectors()
         {
             Vector3f Front = new Vector3f();
@@ -238,6 +231,7 @@ public class Camera implements Panel
         transformPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
+        // Create position labels with sliders
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.weightx = 0.1;
@@ -301,18 +295,19 @@ public class Camera implements Panel
         JPanel checkBoxPanel = new JPanel();
         checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.Y_AXIS));
 
-        JCheckBox lockCameraAt = new JCheckBox("Lock camera at Model");
-        lockCameraAt.addItemListener(e -> {
-            cameraLocked = lockCameraAt.isSelected();
+        JCheckBox cameraLockCheckBox = new JCheckBox("Lock camera at Model");
+        cameraLockCheckBox.addItemListener(e -> {
+            cameraLocked = cameraLockCheckBox.isSelected();
             positionToLookAt = new Vector3f(0.f, 0.f, 0.f);
             front = new Vector3f(0.f, 0.f, -1.f);
             up = new Vector3f(0.f, 1.f, 0.f);
         });
 
-        lockCameraAt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // Set
+        cameraLockCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         checkBoxPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        checkBoxPanel.add(lockCameraAt);
+        checkBoxPanel.add(cameraLockCheckBox);
 
         transformPanel.setBorder(BorderFactory.createTitledBorder("Position"));
         transformPanel.setMaximumSize(new Dimension(Gui.GetWidth(), transformPanel.getPreferredSize().height));

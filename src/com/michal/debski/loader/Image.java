@@ -36,8 +36,11 @@ public class Image
                 throw new RuntimeException("Failed to load an image!" + System.lineSeparator() + stbi_failure_reason());
             }
 
+            // Set dimensions based on info from file
             width = w.get();
             height = h.get();
+
+            // How many colour channels image has?
             nrComponents = components.get();
             int format = 0;
             if(nrComponents == 1)
@@ -57,6 +60,7 @@ public class Image
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+            // Remember to free the memory
             stbi_image_free(imageBuffer);
         }
 

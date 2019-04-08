@@ -64,7 +64,7 @@ public class Loader
         Quad
     };
 
-
+    // Wrap class for a single vertex
     public class mdVertex
     {
         Vector3f position = new Vector3f();
@@ -72,6 +72,7 @@ public class Loader
         Vector2f texCoord = new Vector2f();
     }
 
+    // Wrap class for a single texture
     public class mdTexture
     {
         int id;
@@ -89,9 +90,15 @@ public class Loader
         mtlFilePath = new String();
          directory = new String();
 
-        // The idea is to read all vertices, texture coordinates and normals
-        // from file and then map them to objects basing on their faces.
-        // Every object has it's own data about faces
+        /* The idea is to read all vertices, texture coordinates and normals
+         * from file and then map them to objects basing on their faces.
+         * Every object has it's own data about faces
+         */
+
+        /*
+        * File is read sequentially, so by a switch case statement detect what type of data
+        * is in the line, and basing on that perform appropriate action
+        * */
         List<Float> allVertices = new ArrayList<Float>();
         List<Float> allTexCoords = new ArrayList<Float>();
         List<Float> allNormals = new ArrayList<Float>();
@@ -99,12 +106,14 @@ public class Loader
         int extPos = path.lastIndexOf('.');
         String fullName = path.substring(extPos);
         fullName = fullName.toLowerCase();
+
         if(fullName.contains("obj") == false)
         {
             System.out.println("ERROR: File not supported. Only files with \".obj\" extension are supported.");
             return;
         }
 
+        // Get directory of a read file
         int dirDelimiter = path.lastIndexOf(File.separator);
         directory = path.substring(0, dirDelimiter);
         directory += File.separator;
@@ -113,8 +122,7 @@ public class Loader
             String line;
             mdMesh mesh = new mdMesh();
 
-            // Set default mesh material
-
+            // Set default mesh material for a model read from a file
             mesh.material = new mdMaterial(new Vector3f(0.1f),
                     new Vector3f(0.1f),
                     new Vector3f(0.25f),
@@ -231,9 +239,12 @@ public class Loader
             e.printStackTrace();
         }
 
-        // Check if mtlFilePath contains any path
+        // Check if mtlFilePath contains any path to a .mtl file
         if(!mtlFilePath.isEmpty()) {
-            // Get info about textures used in each mesh
+
+            /*
+            * .mtl file contains data about material and textures used for a .obj model
+            * */
             try (BufferedReader br = new BufferedReader(new FileReader(mtlFilePath))) {
                 String line;
                 while ((line = br.readLine()) != null) {
@@ -244,11 +255,10 @@ public class Loader
                             // Find mesh that uses material with that name
                             mdMesh mesh = findMeshByMaterialName(values[1]);
 
-
                             if(mesh == null)
                                 break;
 
-                            // Find maps and their paths
+                            // Find textures and get their paths
                             while ((line = br.readLine()) != null && !line.contains(MTL_MATERIAL_BIND)) {
                                 values = line.split("\\s+");
                                 switch (values[0]) {
@@ -306,10 +316,11 @@ public class Loader
                                     }
                                 }
 
-                                // Check if the next line contains name of the next material.
-                                // If it contains, break out of the loop.
-                                // While doing that, don't move the buffer cursor,
-                                // so "mark()" and "reset()" method will be used to achieve that
+                                /* Check if the next line contains name of the next material.
+                                 * If it contains, break out of the loop.
+                                 * While doing that, don't move the buffer cursor,
+                                 * so "mark()" and "reset()" method will be used to achieve that
+                                */
                                 br.mark(2000);
                                 if((line = br.readLine()) == null || line.contains(MTL_MATERIAL_BIND))
                                 {
@@ -322,7 +333,6 @@ public class Loader
                         }
                     }
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -365,7 +375,7 @@ public class Loader
 
                 mesh.vertices.add(vertex);
             }
-
+            // Default material shininess
             mesh.material.shininess = 32.f;
 
             mesh.setupMesh();
@@ -374,6 +384,9 @@ public class Loader
 
     public Loader(PrimitiveType type)
     {
+        /*
+        * Constructor for a Primitive object
+        * */
         mdMesh mesh = new mdMesh();
         switch(type)
         {
@@ -411,6 +424,13 @@ public class Loader
 
     private List<mdVertex> arrayToMDVertex(float[] vertices, int stride)
     {
+        /*
+        * Method takes an array of float vertices and translates it into list of mdVertices
+        * @param vertices - float array of vertices
+        * @stride - in this application it shouldn't be different than "8", because
+        *           there is 3 vertices, 3 normal vectors and 2 tex coordinates, which sums up to 8
+        * */
+
         List<mdVertex> verticesList = new ArrayList<>();
 
         for(int i = 0; i < vertices.length; i += stride)
@@ -434,9 +454,11 @@ public class Loader
         return verticesList;
     }
 
-    // Free GPU memory
     public void free()
     {
+        /*
+        * Method cleans up GPU memory after an old meshes
+        * */
         for(mdMesh mesh : meshes)
         {
             for(mdTexture tex : mesh.textures)
@@ -445,8 +467,8 @@ public class Loader
             }
             mesh.textures.clear();
 
-            /*glDeleteBuffers(mesh.vbo);
-            glDeleteVertexArrays(mesh.vao);*/
+            glDeleteBuffers(mesh.vbo);
+            glDeleteVertexArrays(mesh.vao);
         }
     }
 }

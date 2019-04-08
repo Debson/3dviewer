@@ -31,8 +31,6 @@ public class Core
 
     public void OpenGame(GameHandlerInterface gameHandler)
     {
-        //windowProperties = new GameHandlerInterface.WindowProperties(1280, 720);
-
         GLFWErrorCallback.createPrint(System.err).set();
 
         if(!glfwInit())
@@ -60,7 +58,7 @@ public class Core
         System.out.println("Window Width:   " + windowProperties.resolutionWidth[resCouter]);
         System.out.println("Window Height:  " + windowProperties.resolutionHeight[resCouter]);
 
-        window = glfwCreateWindow(windowProperties.getWidth(), windowProperties.getHeight(), "model_loader", NULL, NULL);
+        window = glfwCreateWindow(windowProperties.getWidth(), windowProperties.getHeight(), "3dviewer", NULL, NULL);
         if(window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -197,10 +195,7 @@ public class Core
         glfwMakeContextCurrent(window);
 
         // V-Sync turned on
-        glfwSwapInterval(0);
-
-        // Disable cursor, so it won't block at screen bounds
-        //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSwapInterval(1);
 
         glfwShowWindow(window);
 

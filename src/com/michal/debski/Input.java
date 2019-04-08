@@ -165,7 +165,6 @@ public class Input
     private static boolean[] keys = new boolean[Keycode.count.getValue()];
 	private static boolean[] prevKeys = new boolean[Keycode.count.getValue()];
 
-
     public static boolean IsKeyPressed(Keycode keycode)
     {
 		return keys[keycode.getValue()] && !prevKeys[keycode.getValue()];
@@ -205,6 +204,7 @@ public class Input
 
     static Vector2f GetRelativeMousePos()
     {
+    	// First read of the mouse posX will be large, don't process it.
         if(first)
         {
             first = false;

@@ -2,6 +2,7 @@
  * Developer: Michal Debski
  * Github: github.com/debson
  * Class description:   Static class used to GET and SET a currently used Shader in the application.
+ *                      It allows to access a shader instance globally.
  *
  */
 

@@ -50,6 +50,7 @@ public class Colour implements Panel
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
+        // Create color chooser
         JColorChooser jcc = new JColorChooser(new java.awt.Color(255, 255, 255, 255));
         jcc.getSelectionModel().addChangeListener(e -> {
             java.awt.Color newColor = jcc.getColor();
@@ -61,7 +62,7 @@ public class Colour implements Panel
         // Remove preview panel
         jcc.setPreviewPanel(new JPanel());
 
-
+        // Leave only RGB component
         AbstractColorChooserPanel[] panels = jcc.getChooserPanels();
         for(AbstractColorChooserPanel accp : panels)
         {
@@ -71,6 +72,7 @@ public class Colour implements Panel
             }
             else
             {
+                // Hacky way of removing sliders(there is no other way TBH)
                 accp.remove(1);
                 JPanel p2 = (JPanel) accp.getComponent(0);
                 // Remove 9 components(sliders and their lables...)

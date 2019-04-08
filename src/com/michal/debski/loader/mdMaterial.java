@@ -101,8 +101,6 @@ public class mdMaterial implements Panel
         gbc.gridx++;
         slidersContainer.add(valueLabel, gbc);
 
-
-        //panel.setMaximumSize(new Dimension(Gui.GetWidth(), panel.getPreferredSize().height));
         panel.setBorder(BorderFactory.createTitledBorder("Material"));
 
         return new PanelEntity(panel, "Material", false, false);

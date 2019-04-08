@@ -23,8 +23,8 @@ import static org.lwjgl.opengl.GL30.*;
 public class Shadows
 {
     // High quality shadows
-    private final int shadowWidth = 8192;
-    private final int shadowHeight = 8192;
+    private final int shadowWidth = 1024;
+    private final int shadowHeight = 1024;
 
     private final String shadowShaderVertPath = "shaders" + File.separator + "shadowShader.vert";
     private final String shadowShaderFragPath = "shaders" + File.separator + "shadowShader.frag";
@@ -32,9 +32,9 @@ public class Shadows
 
 
     private Matrix4f lightSpaceMatrix;
-    public final float nearPlane = 1.0f;
+    public final float nearPlane = 0.1f;
     public final float farPlane = 100.0f;
-    public final float lightProjectionSize = 100.f;
+    public final float lightProjectionSize = 20.f;
     private Vector3f lightPos;
 
     private int depthMapFBO, depthMap;
@@ -82,7 +82,7 @@ public class Shadows
         ShaderManager.SetShader(shader);
 
         Matrix4f lightProjection = new Matrix4f().ortho(-lightProjectionSize, lightProjectionSize, -lightProjectionSize, lightProjectionSize, nearPlane, farPlane);
-        Matrix4f lightView = new Matrix4f().lookAt(lightPos, new Vector3f(0.f), new Vector3f(0.f, 1.f, 0.f));
+        Matrix4f lightView = new Matrix4f().lookAt(new Vector3f(lightPos.x, lightPos.y, lightPos.z), new Vector3f(0.f), new Vector3f(0.f, 1.f, 0.f));
         lightSpaceMatrix = new Matrix4f();
         lightProjection.mul(lightView, lightSpaceMatrix);
 

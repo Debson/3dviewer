@@ -43,18 +43,15 @@ public class Gui extends JFrame
     private JScrollPane settingsScrollPanel;
     private JPanel titleBar = new JPanel();
     private CardLayout cardLayout = new CardLayout();
-    private int modelLoadedCount = 0;
     private String currentCardName = "";
     JFileChooser fileChooser = null;
 
     private int fileBrowserReturnValue = -1;
-    private Model model;
+
 
     public Gui()
     {
         super("Settings");
-        this.model = model;
-
         mainPanel.setLayout(cardLayout);
 
         setLayout(new GridLayout(2, 1));
@@ -77,10 +74,10 @@ public class Gui extends JFrame
         mainPanel.setPreferredSize(new Dimension(width - 10, Core.windowProperties.getHeight() - 10));
         mainPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-
         // Set up indexPanelContainer(contains three categories, models, primitives and settings)
         indexPanelContainer.setLayout(new BoxLayout(indexPanelContainer, BoxLayout.Y_AXIS));
 
+        // Before that, add panel with FPS label.
         fpsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         JLabel fpsLabel = new JLabel("FPS: 60.00", JLabel.CENTER);
         fpsLabel.setBorder(BorderFactory.createEtchedBorder(Color.red, Color.black));
@@ -90,6 +87,7 @@ public class Gui extends JFrame
 
         FpsCounter.SetFpsLabel(fpsLabel);
 
+        // Set panels layout and border
         loadedModelsPanel.setLayout(new BoxLayout(loadedModelsPanel, BoxLayout.Y_AXIS));
         loadedModelsPanel.setBorder(BorderFactory.createTitledBorder("Models"));
 
@@ -99,6 +97,7 @@ public class Gui extends JFrame
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
         settingsPanel.setBorder(BorderFactory.createTitledBorder("Settings"));
 
+        // Add panels to the
         indexPanelContainer.add(fpsPanel);
         indexPanelContainer.add(loadedModelsPanel);
         indexPanelContainer.add(settingsPanel);
@@ -148,8 +147,9 @@ public class Gui extends JFrame
         // Create border around the frame
         getRootPane().setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-        // Add focus listener, so it will restore model_loader window, when
-        // GUI frame has focus
+        /*  Add focus listener, so it will restore model_loader window, when
+         *  GUI frame has focus
+         */
         addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -164,10 +164,9 @@ public class Gui extends JFrame
         });
         validate();
 
+        //  Add some basic settings for JFrame
         setType(JFrame.Type.UTILITY);
-        //setAlwaysOnTop(true);
         setUndecorated(true);
-
         setBounds(Core.windowProperties.getPosX() - width,
                 Core.windowProperties.getPosY() - windowsTitleBarSize,
                 width, Core.windowProperties.getHeight() + windowsTitleBarSize);
@@ -198,24 +197,24 @@ public class Gui extends JFrame
         return width;
     }
 
-    public void setPosition()
+    public void updatePosition()
     {
         setLocation(Core.windowProperties.getPosX() - width,
                 Core.windowProperties.getPosY() - windowsTitleBarSize);
     }
 
-    /*
-     * Function: Update
-     * -----------------------------------------------
-     *  Used to create a Model from a path obtained from JFileChooser. Model cannot be created
-     *  inside JFileChooser listener, because it runs on a different thread than the context
-     *  created for application. Function is called every frame, and when JFileChooser
-     *  action is finished, then function create a new model.
-     *
-     */
-
     public void Update()
     {
+        /*
+         * Function: Update
+         * -----------------------------------------------
+         *  Used to create a Model from a path obtained from JFileChooser. Model cannot be created
+         *  inside JFileChooser listener, because it runs on a different thread than the context
+         *  created for application. Function is called every frame, and when JFileChooser
+         *  action is finished, then function create a new model.
+         *
+         */
+
         if(fileBrowserReturnValue == JFileChooser.APPROVE_OPTION)
         {
             // Get selected file
@@ -230,17 +229,17 @@ public class Gui extends JFrame
         }
     }
 
-    /*
-     * Function:  createGui
-     * -----------------------------------------------
-     *  Function takes an ArrayList of objects that implements interface Panel
-     *  and calls function, which creates a GUI for that specific objects, then
-     *  puts it in a correct panel in a correct way
-     *
-     */
-
     public void createGui(ArrayList<Panel> panelEntityList)
     {
+        /*
+         * Function:  createGui
+         * -----------------------------------------------
+         *  Function takes an ArrayList of objects that implements interface Panel
+         *  and calls function, which creates a GUI for that specific objects, then
+         *  puts it in a correct panel in a correct way
+         *
+         */
+
         for(Panel panel : panelEntityList)
         {
             PanelEntity panelEntity =  panel.createPanelEntity();
@@ -254,6 +253,12 @@ public class Gui extends JFrame
 
             mainPanel.add(scrollPane, panelEntity.getPanelName());
 
+
+            /*  Every panel created by "createPanelEntity" has it's own setting button, allowing to access that panel.
+             *  Also created panel has go back button, and if panel is a panel created from a model loaded from a file, it
+             *  will also have "delete" button (currently not active, functionality may be added later on)
+             */
+
             JButton settingButton = new JButton(panelEntity.getPanelName());
             settingButton.setMaximumSize(new Dimension((int)(Gui.GetWidth() * 0.6f), 30));
             settingButton.addActionListener(e -> {
@@ -262,7 +267,8 @@ public class Gui extends JFrame
             });
 
             settingButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-            // Create bottom padding for buttons
+
+            // Box.createRigidArea creates bottom padding
             if(panelEntity.isModel())
             {
                 if (loadedModelsPanel.getComponentCount() > 0)
@@ -307,12 +313,14 @@ public class Gui extends JFrame
                 deleteObjectButton.setEnabled(false);
 
                 deleteObjectButton.addActionListener(e -> {
-                    if(currentCardName.equals(panelEntity.getPanelName()))
-                    {
-                        cardLayout.show(mainPanel, "Settings");
-                    }
+
+                    // Display settings panel
+                    cardLayout.show(mainPanel, "Settings");
+
+                    // Remove card of deleted panel and also delte button, that access deleted panel in a settings card
                     mainPanel.remove(scrollPane);
                     loadedModelsPanel.remove(settingButton);
+                    // Find a model that corresponds to deleted panel and delete it(free memory mostly)
                     for(Model model : Containers.modelContainer)
                     {
                         if(model.getName().equals(panelEntity.getPanelName()))
@@ -320,10 +328,9 @@ public class Gui extends JFrame
                             model.delete();
                         }
                     }
-                    modelLoadedCount--;
                 });
+
                 buttonPanel.add(deleteObjectButton, Component.RIGHT_ALIGNMENT);
-                modelLoadedCount++;
             }
 
             buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -336,32 +343,36 @@ public class Gui extends JFrame
         }
     }
 
-    /*
-     * Function: replaceModel
-     * -----------------------------------------------
-     *  Function that replaces GUI for currently loaded model.
-     *
-     */
     public void replaceModel()
     {
-        if(modelLoadedCount > 0)
+        /*
+         *  Method replaces GUI of currently loaded model to a new one
+         *
+         */
+
+        //if(modelLoadedCount > 0)
         {
-            //mainPanel.remove(1);
             loadedModelsPanel.remove(0);
         }
 
+        // Get the most recently added model and create a panel entity from it.(Containers class provides global access to loaded models)
         PanelEntity panelEntity = Containers.modelContainer.get(Containers.modelContainer.size() - 1).createPanelEntity();
-
         panelEntity.getPanel().setBorder(BorderFactory.createTitledBorder(panelEntity.getPanelName()));
 
+        // Create scroll panel in case loaded panel will have too many components
         panelEntity.getPanel().setAutoscrolls(true);
         JScrollPane scrollPane = new JScrollPane(panelEntity.getPanel(),
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-        // Bug
+        // Panel is ready to add to main panel(card layout)
         mainPanel.add(scrollPane, panelEntity.getPanelName());
 
+
+        /*  Every panel created by "createPanelEntity" has it's own setting button, allowing to access that panel.
+         *  Also created panel has go back button, and if panel is a panel created from a model loaded from a file, it
+         *  will also have "delete" button (currently not active, functionality may be added later on)
+         */
 
         JButton settingButton = new JButton(panelEntity.getPanelName());
         settingButton.setMaximumSize(new Dimension((int)(Gui.GetWidth() * 0.6f), 30));
@@ -409,20 +420,23 @@ public class Gui extends JFrame
                         model.delete();
                     }
                 }
-                modelLoadedCount--;
+
                 validate();
                 repaint();
             });
             buttonPanel.add(deleteObjectButton, Component.RIGHT_ALIGNMENT);
-            modelLoadedCount++;
         }
 
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panelEntity.getPanel().add(buttonPanel, 0);
         panelEntity.getPanel().setAutoscrolls(true);
+
+        // Remember to validate the layout. Otherwise no changes could be seen.
         validate();
         repaint();
 
+        // Always after new model is loaded, switch to settings panel
+        // TODO: switch to settings card only when current card is a previous model's card
         cardLayout.show(mainPanel, "Settings");
     }
 }

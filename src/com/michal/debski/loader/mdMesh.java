@@ -40,7 +40,7 @@ public class mdMesh
 
     }
 
-    // Class that
+    // Copy constructor
     public mdMesh(mdMesh other)
     {
         this.name           = other.name;
@@ -58,6 +58,11 @@ public class mdMesh
 
     public void setupMesh()
     {
+        /*
+        * Send loaded data to the GPU in a specific sequence
+        *
+        * */
+
         // Multiplied by 8, because 3 position vertices, 3 normals, 2 texture coordinates
         float[] vertsArray = new float[vertices.size() * 8];
 
@@ -106,12 +111,7 @@ public class mdMesh
 
     public void Render()
     {
-        int ambientNr   = 1;
-        int diffuseNr   = 1;
-        int specularNr  = 1;
-        int normalNr    = 1;
-        int heightNr    = 1;
-
+        // Access global shader
         ShaderManager.GetShader().use();
 
         ShaderManager.GetShader().setBool("textureActive", false);
@@ -119,27 +119,6 @@ public class mdMesh
         {
             Loader.mdTexture texture = textures.get(i);
             glActiveTexture(GL_TEXTURE0 + i);
-            /*String name = texture.type;
-            int num = 0;
-            if(name.equals(AMBIENT_MAP))
-            {
-                num = ambientNr++;
-            }
-            else if(name.equals(DIFFUSE_MAP))
-            {
-                num = diffuseNr++;
-            }
-            else if(name.equals(SPECULAR_MAP))
-            {
-                num = specularNr++;
-            }
-            else if(name.equals(NORMAL_MAP))
-            {
-                num = normalNr++;
-            }
-            else if(name.equals(HEIGHT_MAP)) {
-                num = heightNr++;
-            }*/
 
             ShaderManager.GetShader().setInt("material." + texture.type + "Map", i);
             ShaderManager.GetShader().setBool("textureActive", true);

@@ -32,16 +32,17 @@ public class Scene implements GameHandlerInterface, SceneInterface
     @Override
     public void OnWindowOpen()
     {
+        // Initialize default shader
         shader = new Shader("shaders" + File.separator + "default.vert", "shaders" + File.separator + "default.frag");
 
-
+        // Initialize scene camera
         camera = new Camera(new Vector2f(
                 WindowProperties.getWidth(),
                 WindowProperties.getHeight()),
                 new Vector3f(0.f, 15.f, 30.f));
 
 
-        // Remember to use "\\" directory delimiter! Otherwise there will be an error.
+        // Use cross-platform compatible paths
         String path = "assets" + File.separator + "teapot.obj";
         String path2 = "assets" + File.separator + "nanosuit" + File.separator + "nanosuit.obj";
         String path3 = "assets" + File.separator + "teddybear.obj";
@@ -52,21 +53,21 @@ public class Scene implements GameHandlerInterface, SceneInterface
         myModel.getTransform().setPosition(new Vector3f(0.f, 0.f, 0.f));
         myModel.getTransform().setScale(new Vector3f(1.f));
         //myModel.setColor(new Colour(1.f, 0.5f, 1.f));
+
+        // Initialize and configure scene's floor
         floor = new Model("Floor", Loader.PrimitiveType.Plane);
         floor.setColor(new Colour(1.f, 0.f, 1.f, 1.f));
 
+        // Initialize and configure primitive type - cube
         cube = new Model("Cube", Loader.PrimitiveType.Cube);
-        //cube.setScale(new Vector3f(50.f, 1.f, 50.f));
         cube.getTransform().setPosition(new Vector3f(0.f, 1.f, 10.f));
 
-        //camera.lockCameraAt(myModel.getTransform().getPosition(), true);
-
+        // Initialize and configure directional light in the scene
         dirLight = new DirectionalLight(new Vector3f( -20.f, 30.f, -30.f), new Colour( 1.f));
         dirLight.getTransform().setScale(new Vector3f(3.f));
 
-
+        // Initialize and create guy. It should be done after all objects in the scene were initialized.
         gui = new Gui();
-
         gui.createGui(Containers.panelContainer);
     }
 
@@ -98,7 +99,6 @@ public class Scene implements GameHandlerInterface, SceneInterface
         {
             gui.Update();
         }
-
     }
 
     @Override
@@ -114,20 +114,23 @@ public class Scene implements GameHandlerInterface, SceneInterface
         dirLight.Render(camera.transform.getPosition());
         // Render scene as normal
         renderScene(shader);
-
     }
 
     @Override
     public void OnFileDrop(String pathOfDroppedFile)
     {
         myModel.createNew(pathOfDroppedFile);
+        gui.replaceModel();
     }
 
     @Override
     public void OnWindowMove(int winX, int winY)
     {
+        /*
+         * If Gui class instance is initialized, update it's position
+         */
         if(gui != null)
-            gui.setPosition();
+            gui.updatePosition();
     }
 
     @Override
@@ -139,6 +142,11 @@ public class Scene implements GameHandlerInterface, SceneInterface
 
     private void updateMatrices(Shader shader)
     {
+        /*
+         *  Update shader matrices. View matrix should be updated every frame, but
+         *  it's not necessary for a projection matrix.
+         *
+         */
         shader.use();
         shader.setMat4("projection", camera.getProjectionMatrix());
         shader.setMat4("view", camera.getViewMatrix());
@@ -181,6 +189,13 @@ public class Scene implements GameHandlerInterface, SceneInterface
         cube.Render();
     }
 
+    /*
+     *   Main method creates an instance of our Scene class. Then another instance of a Game -
+     *   class that will take the scene object as an argument. It is possible, because Scene class
+     *   implements from GameInterfaceHandler(polymorphism). Then, Game methods are called, which
+     *   through inheritance invokes Core class methods.
+     *
+     */
     public static void main(String[] args)
     {
         Scene scene = new Scene();

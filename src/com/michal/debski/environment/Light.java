@@ -26,12 +26,8 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class Light extends Model
 {
-    // This should be the parent class. Child classes: directional light, point light
-    // Light method render should be called before any drawing, so it will set boolean variable
-    // that manages lighting in shader to true, so the scene will be drawn with lighting.
-    protected float strength;
     protected boolean lightActive = true;
-    private boolean orbiting = false;
+    private boolean orbitingActive = false;
     private Vector3f orbitingPosition = null;
     private float orbitingRadius = 10.f;
     private float orbitingSpeed = 2.f;
@@ -70,7 +66,7 @@ public class Light extends Model
 
     public void setOribitng(boolean orbiting)
     {
-        this.orbiting = orbiting;
+        this.orbitingActive = orbiting;
         if(orbiting) {
             orbitingTimer.start();
             orbitingRadius = new Vector2f().distance(new Vector2f(getTransform().getPosition().x, getTransform().getPosition().z));
@@ -105,14 +101,20 @@ public class Light extends Model
 
     public void Render(Vector3f cameraPosition)
     {
+        /*
+        * This method will be always overwritten anyway.
+        *
+        * */
+
         ShaderManager.GetShader().use();
         renderLight();
         if(lightActive)
         {
-
-            /*ShaderManager.GetShader().setVec3("light.direction", getTransform().getPosition());
-            //ShaderManager.GetShader().setVec3("lightPos", position);
-            ShaderManager.GetShader().setVec3("light.color", color.r, color.g, color.b);*/
+            ShaderManager.GetShader().setVec3("light.direction", getTransform().getPosition());
+            Colour color = getColor();
+            ShaderManager.GetShader().setVec3("light.color", color.r * getTransform().getScale().x,
+                    color.g * getTransform().getScale().y,
+                    color.b * getTransform().getScale().z);
         }
     }
 
@@ -121,7 +123,7 @@ public class Light extends Model
         if(renderLightCube)
         {
             ShaderManager.GetShader().setBool("lightActive", false);
-            if(orbiting)
+            if(orbitingActive)
             {
                 getTransform().getPosition().x = (float)Math.sin(orbitingTimer.getCurrentTime() * orbitingSpeed) * orbitingRadius;
                 getTransform().getPosition().z = (float)Math.cos(orbitingTimer.getCurrentTime() * orbitingSpeed) * orbitingRadius;
@@ -141,16 +143,18 @@ public class Light extends Model
 
         if(castShadows)
         {
+            // Save previously used shader
             Shader tempShader = ShaderManager.GetShader();
+
+            // Fill the shadow buffer rendering current scene into it
             shadows.fillDepthMap(scene);
 
+            // Switch to a default shader(shadows.fillDepthMap changes the global shader to shadow's shader)
             ShaderManager.SetShader(tempShader);
 
             // Render scene as normal
-
             ShaderManager.GetShader().setInt("shadows.depthMap", 6);
             ShaderManager.GetShader().setMat4("lightSpaceMatrix", shadows.getLightSpaceMatrix());
-            //ShaderManager.GetShader().setBool("shadows.switchedOn", true);
             glActiveTexture(shadows.shaderTextureNum);
             glBindTexture(GL_TEXTURE_2D, shadows.getDepthMap());
         }
@@ -176,33 +180,30 @@ public class Light extends Model
         // Get panel with transform settings
         JPanel transformPanel = getTransform().createPanelEntity().getPanel();
 
+        // Create panel for orbiting settings
         JPanel orbitingPanel = new JPanel();
         orbitingPanel.setLayout(new GridBagLayout());
 
-
+        // Create panel for Light and Shadows settings
         JPanel environmentPanel = new JPanel();
         environmentPanel.setLayout(new GridBagLayout());
 
+        // Configure oribiting panel
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.weightx = 0.1;
         gbc.insets = new Insets(2,2,5,2);
 
-
         JLabel radiusLabel = new JLabel(String.format("%-2.2f", orbitingRadius));
         radiusLabel.setBorder(BorderFactory.createLineBorder(Color.black));
         radiusLabel.setPreferredSize(new Dimension(20, 20));
 
-
-        int sliderWidth = 200;
-        int sliderHeight = 50;
         JSlider radiusSlider = new JSlider(JSlider.HORIZONTAL, 1, 50, (int)orbitingRadius);
         radiusSlider.addChangeListener(e -> {
             orbitingRadius = radiusSlider.getValue();
             radiusLabel.setText(String.format("%-2.2f", orbitingRadius));
         });
-
 
         JLabel speedLabel = new JLabel(String.format("%-2.2f", orbitingSpeed));
         speedLabel.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -214,12 +215,11 @@ public class Light extends Model
             speedLabel.setText(String.format("%-2.2f", orbitingSpeed));
         });
 
-
         JCheckBox orbitingCheckBox = new JCheckBox("Is orbiting");
-        orbitingCheckBox.setSelected(this.orbiting);
-        PanelUtility.SetPanelEnabled(transformPanel, !this.orbiting);
-        radiusSlider.setEnabled(this.orbiting);
-        speedSlider.setEnabled(this.orbiting);
+        orbitingCheckBox.setSelected(this.orbitingActive);
+        PanelUtility.SetPanelEnabled(transformPanel, !this.orbitingActive);
+        radiusSlider.setEnabled(this.orbitingActive);
+        speedSlider.setEnabled(this.orbitingActive);
         orbitingCheckBox.addItemListener(e -> {
             if(e.getStateChange() == ItemEvent.SELECTED) {
                 setOribitng(true);
@@ -269,13 +269,14 @@ public class Light extends Model
         orbitingPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         orbitingPanel.setBorder(BorderFactory.createTitledBorder("Orbiting"));
 
+
+        // Configure environment panel
         gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.weightx = 0.1;
         gbc.gridy = 0;
         gbc.insets = new Insets(2,2,5,2);
-        //gbc.gridwidth = 2;
         JCheckBox shadowsCheckBox = new JCheckBox("Cast Shadows");
         shadowsCheckBox.setSelected(this.castShadows);
         shadowsCheckBox.addItemListener(e -> {
@@ -301,11 +302,11 @@ public class Light extends Model
         // Create color picker panel
         JPanel colorPanel = getColor().createPanelEntity().getPanel();
 
+        // Compose a main panel from previously created and configured panels
         panel.add(transformPanel);
         panel.add(colorPanel);
         panel.add(orbitingPanel);
         panel.add(environmentPanel);
-
 
         return new PanelEntity(panel, panelName, false, false);
     }

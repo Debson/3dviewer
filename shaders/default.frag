@@ -1,3 +1,10 @@
+/* Date: 03/04/2019
+ * Developer: Michal Debski
+ * Github: github.com/debson
+ * Description:
+ * Sources: Shadows code partly borrowed from "https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping"
+ */
+
 #version 330 core
 out vec4 FragColor;
 

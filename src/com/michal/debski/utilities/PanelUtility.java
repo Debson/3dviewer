@@ -30,8 +30,6 @@ public class PanelUtility
 
     public static JPanel CreatePanelFromMultipleVector3f(String[] labels, Vector3f[] vectorList, int[] minVals, int[] maxVals, int multiplier)
     {
-        int panelWidth = 200;
-
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
@@ -41,7 +39,6 @@ public class PanelUtility
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridy = 0;
         // Put it into GirdLayout with 3 columns. First label, slider and slider value label
-        //int gridyCounter = 0;
         for(int i = 0; i < labels.length; i++)
         {
             JLabel label = new JLabel(labels[i], JLabel.CENTER);
@@ -103,8 +100,6 @@ public class PanelUtility
 
             gbc.fill = GridBagConstraints.BOTH;
             gbc.anchor = GridBagConstraints.WEST;
-            //gbc.weighty = 0.1;
-            //gbc.weightx = 0.5;
             gbc.insets = new Insets(2, 2, 2, 2);
             gbc.gridx = 0;
 
