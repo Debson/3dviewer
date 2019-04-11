@@ -2,7 +2,11 @@
  * Developer: Michal Debski
  * Github: github.com/debson
  * Description:
- * Sources: Shadows code partly borrowed from "https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping"
+ * Sources: Shadows code partly borrowed from "https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping".
+            Why did I take code from that tutorial? That's one of the simplest implementation of shadow calculations
+            for a directional light, there is really no other ways to implement it differently. I could only change
+            variable names or change Percentage-close Filtering(PCF) algorithm, which wasn't needed for this specific demo.
+ *
  */
 
 #version 330 core

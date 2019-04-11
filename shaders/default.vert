@@ -1,7 +1,7 @@
 /* Date: 03/04/2019
  * Developer: Michal Debski
  * Github: github.com/debson
- * Description:
+ * Description: Simple vertex shader that does calculations on vertex data sent to the shader
  *
  */
 

@@ -18,8 +18,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileSystemView;
 
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -148,17 +147,17 @@ public class Gui extends JFrame
         getRootPane().setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         /*  Add focus listener, so it will restore model_loader window, when
-         *  GUI frame has focus
+         *  GUI frame has focus. It will prevent from situations when gui window
+         *  is in front and main window is in background
          */
-        addFocusListener(new FocusListener() {
+        addWindowFocusListener(new WindowFocusListener() {
             @Override
-            public void focusGained(FocusEvent e) {
+            public void windowGainedFocus(WindowEvent e) {
                 Window.FocusWindow();
-                Window.RestoreWindow();
             }
 
             @Override
-            public void focusLost(FocusEvent e) {
+            public void windowLostFocus(WindowEvent e) {
 
             }
         });
